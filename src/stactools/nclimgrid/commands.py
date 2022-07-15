@@ -3,22 +3,22 @@ import logging
 import click
 from click import Command, Group
 
-from stactools.ephemeral import stac
+from stactools.nclimgrid import stac
 
 logger = logging.getLogger(__name__)
 
 
-def create_ephemeralcmd_command(cli: Group) -> Command:
-    """Creates the stactools-ephemeral command line utility."""
+def create_nclimgrid_command(cli: Group) -> Command:
+    """Creates the stactools-nclimgrid command line utility."""
 
     @cli.group(
-        "ephemeralcmd",
-        short_help=("Commands for working with stactools-ephemeral"),
+        "nclimgrid",
+        short_help=("Commands for working with stactools-nclimgrid"),
     )
-    def ephemeralcmd() -> None:
+    def nclimgrid() -> None:
         pass
 
-    @ephemeralcmd.command(
+    @nclimgrid.command(
         "create-collection",
         short_help="Creates a STAC collection",
     )
@@ -37,7 +37,7 @@ def create_ephemeralcmd_command(cli: Group) -> Command:
 
         return None
 
-    @ephemeralcmd.command("create-item", short_help="Create a STAC item")
+    @nclimgrid.command("create-item", short_help="Create a STAC item")
     @click.argument("source")
     @click.argument("destination")
     def create_item_command(source: str, destination: str) -> None:
@@ -53,4 +53,4 @@ def create_ephemeralcmd_command(cli: Group) -> Command:
 
         return None
 
-    return ephemeralcmd
+    return nclimgrid
