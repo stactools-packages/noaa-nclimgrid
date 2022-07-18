@@ -7,7 +7,7 @@ from typing import List, Optional
 import stactools.core.create
 from pystac import Asset, Item, MediaType
 
-from stactools.nclimgrid.cog import cog_daily, cog_monthly
+from stactools.nclimgrid.cog import cog_daily, cog_monthly, create_cogs
 from stactools.nclimgrid.constants import (
     ASSET_TITLES,
     RASTER_BANDS,
@@ -71,23 +71,27 @@ def create_items(nc_href: str, cog_dir: str, latest_only: bool = False) -> List[
     if daily:
         days = day_indices(nc_hrefs["prcp"])
         for day in days:
-            cog_paths = cog_daily(nc_hrefs, cog_dir, day)
+            cog_paths = create_cogs(nc_hrefs, cog_dir, day=day)
             items.append(create_item(cog_paths, nc_hrefs))
 
     else:
         months = month_indices(nc_hrefs["prcp"])
         for month in months:
-            cog_paths = cog_monthly(nc_hrefs, cog_dir, month)
+            cog_paths = create_cogs(nc_hrefs, cog_dir, month=month)
             items.append(create_item(cog_paths, nc_hrefs))
 
-    import json
+    return items
 
-    for item in items:
-        print(json.dumps(item.to_dict(), indent=4))
-
-
-nc_href = "tests/data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"  # noqa
-nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
+# nc_href = "tests/data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"  # noqa
+# nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
 # nc_href = "https://nclimgridwesteurope.blob.core.windows.net/nclimgrid/nclimgrid-daily/beta/by-month/2022/06/prcp-202206-grd-prelim.nc"  # noqa
-cog_dir = "test_cogs"
-create_items(nc_href, cog_dir)
+
+nc_href = "/Users/pjh/data/nclimgrid-dev/monthly/nclimgrid_prcp.nc"
+cog_dir = "./pjh/test_cogs"
+cog_dir = "/Users/pjh/dev/nclimgrid/pjh/test_cogs"
+items = create_items(nc_href, cog_dir)
+
+# import json
+# for item in items:
+#     with open(f"pjh/test_items/{item.id}") as f:
+#         json.dump(item.to_dict(), f)

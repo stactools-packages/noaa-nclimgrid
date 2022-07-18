@@ -47,8 +47,10 @@ def month_indices(nc_href: str) -> List[Dict[str, Any]]:
         years = ds.time.dt.year.data.tolist()
         months = ds.time.dt.month.data.tolist()
 
-    indices = []
+    idx_month = []
     for idx, (year, month) in enumerate(zip(years, months), start=1):
-        indices.append({"idx": idx, "date": f"{year}{month:02d}"})
+        idx_month.append({"idx": idx, "date": f"{year}{month:02d}"})
 
-    return indices
+    idx_month = sorted(idx_month, key=lambda month: month["idx"], reverse=True)
+
+    return idx_month

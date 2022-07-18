@@ -1,4 +1,5 @@
 VARS = ["prcp", "tavg", "tmax", "tmin"]
+
 ASSET_TITLES = {
     "prcp": "Precipitation (mm)",
     "tavg": "Average Temperature (degree Celsius)",
