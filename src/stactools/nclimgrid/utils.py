@@ -10,6 +10,8 @@ from stactools.nclimgrid.constants import VARS
 def nc_href_dict(nc_href: str) -> Tuple[Dict[str, str], bool]:
     base, filename = os.path.split(nc_href)
 
+    # TODO: This needs to be reworked to preserve the entire filename in case 
+    # there is something like a SAS token on the end.
     if "nclimgrid" in filename:  # monthly
         filenames = {var: f"nclimgrid_{var}.nc" for var in VARS}
         daily = False

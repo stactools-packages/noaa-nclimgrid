@@ -1,22 +1,25 @@
 import os
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 from urllib.parse import urlparse
+import warnings
 
-# from stactools.core.utils.convert import cogify
-from rasterio.errors import DriverRegistrationError
-from rasterio.io import MemoryFile
 import rasterio
+import rasterio.shutil
+from rasterio.io import MemoryFile
+from rasterio.errors import NotGeoreferencedWarning
+import numpy as np
 
-from stactools.core import utils
 from stactools.nclimgrid.constants import VARS
+
+TRANSFORM = [0.04166667, 0.0, -124.70833333, 0.0, -0.04166667, 49.37500127]
 
 BASE_PROFILE = {
     "compress": "deflate",
-    "driver": "COG",
     "blocksize": 512,
-    "epsg": 4326,
-    "nodata": "nan",
+    "crs": "epsg:4326",
+    "nodata": np.nan,
     "count": 1,
+    "transform": rasterio.Affine(*TRANSFORM),
 }
 
 
@@ -25,6 +28,7 @@ def cogify(
     cog_file: str,
     nc_index: int,
 ) -> None:
+    warnings.simplefilter("ignore", NotGeoreferencedWarning)
     with rasterio.open(nc_file) as src:
         single_band = src.read(nc_index)
 
@@ -33,51 +37,14 @@ def cogify(
             {
                 "width": src.width,
                 "height": src.height,
-                "transform": src.transform,
                 "dtype": single_band.dtype,
             }
         )
 
         with MemoryFile() as mem:
             with mem.open(**profile, driver="GTiff") as temp:
-                temp.write(single_band)
+                temp.write(single_band, 1)
                 rasterio.shutil.copy(temp, cog_file, **profile, driver="COG")
-
-
-def cog_daily(nc_hrefs: Dict[str, str], cog_dir: str, day: int) -> Dict[str, str]:
-    cog_paths = {}
-    for var in VARS:
-        basename = os.path.splitext(os.path.basename(nc_hrefs[var]))[0]
-        cog_paths[var] = os.path.join(cog_dir, f"{basename}-{day:02d}.tif")
-
-    mode = ""
-    if urlparse(nc_hrefs["prcp"]).scheme.startswith("http"):
-        mode = "#mode=bytes"
-
-    augmented_nc_hrefs = {}
-    for var in VARS:
-        augmented_nc_hrefs[var] = f"netcdf:{nc_hrefs[var]}{mode}:{var}"
-        cogify(augmented_nc_hrefs[var], cog_paths[var], day)
-
-    return cog_paths
-
-
-def cog_monthly(
-    nc_hrefs: Dict[str, str], cog_dir: str, month: Dict[str, str]
-) -> Dict[str, str]:
-    filenames = {var: f"nclimgrid-{var}-{month['date']}.tif" for var in VARS}
-    cog_paths = {var: os.path.join(cog_dir, filenames[var]) for var in VARS}
-
-    mode = ""
-    if urlparse(nc_hrefs["prcp"]).scheme.startswith("http"):
-        mode = "#mode=bytes"
-
-    augmented_nc_hrefs = {}
-    for var in VARS:
-        augmented_nc_hrefs[var] = f"netcdf:{nc_hrefs[var]}{mode}:{var}"
-        cogify(augmented_nc_hrefs[var], cog_paths[var], month["idx"])
-
-    return cog_paths
 
 
 def create_cogs(
@@ -89,20 +56,19 @@ def create_cogs(
     cog_paths = {}
     if day:
         nc_index = day
-        for var in VARS:
-            basename = os.path.splitext(os.path.basename(nc_hrefs[var]))[0]
-            cog_paths[var] = os.path.join(cog_dir, f"{basename}-{day:02d}.tif")
+        basenames = {var: os.path.splitext(os.path.basename(nc_hrefs[var]))[0] for var in VARS}
+        cog_paths = {var: os.path.join(cog_dir, f"{basenames[var]}-{day:02d}.tif") for var in VARS}
     else:
         nc_index = month["idx"]
         filenames = {var: f"nclimgrid-{var}-{month['date']}.tif" for var in VARS}
         cog_paths = {var: os.path.join(cog_dir, filenames[var]) for var in VARS}
 
-    
     mode = ""
     if urlparse(nc_hrefs["prcp"]).scheme.startswith("http"):
         mode = "#mode=bytes"
 
-    augmented_nc_hrefs = {}
     for var in VARS:
-        augmented_nc_hrefs[var] = f"netcdf:{nc_hrefs[var]}{mode}:{var}"
-        cogify(augmented_nc_hrefs[var], cog_paths[var], nc_index)
+        augmented_nc_href = f"netcdf:{nc_hrefs[var]}{mode}:{var}"
+        cogify(augmented_nc_href, cog_paths[var], nc_index)
+    
+    return cog_paths

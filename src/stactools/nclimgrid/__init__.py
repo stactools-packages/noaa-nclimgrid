@@ -1,9 +1,10 @@
 import stactools.core
 from stactools.cli.registry import Registry
 
-from stactools.nclimgrid.stac import create_collection, create_item
+# from stactools.nclimgrid.stac import create_collection, create_item
+from stactools.nclimgrid.stac import create_item
 
-__all__ = ["create_collection", "create_item"]
+# __all__ = ["create_collection", "create_item"]
 
 stactools.core.use_fsspec()
 
