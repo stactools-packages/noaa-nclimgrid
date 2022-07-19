@@ -10,7 +10,7 @@ from stactools.nclimgrid.constants import VARS
 def nc_href_dict(nc_href: str) -> Tuple[Dict[str, str], bool]:
     base, filename = os.path.split(nc_href)
 
-    # TODO: This needs to be reworked to preserve the entire filename in case 
+    # TODO: This needs to be reworked to preserve the entire filename in case
     # there is something like a SAS token on the end.
     if "nclimgrid" in filename:  # monthly
         filenames = {var: f"nclimgrid_{var}.nc" for var in VARS}
@@ -37,7 +37,7 @@ def day_indices(nc_href: str) -> List[int]:
         min_prcp = dataset.prcp.min(dim=("lat", "lon"), skipna=True)
         days = sum(min_prcp >= 0).values
 
-    return range(days, 0, -1)
+    return list(range(days, 0, -1))
 
 
 def month_indices(nc_href: str) -> List[Dict[str, Any]]:

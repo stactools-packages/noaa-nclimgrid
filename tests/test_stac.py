@@ -1,59 +1,52 @@
-import os
 from tempfile import TemporaryDirectory
+from typing import Any, Dict, Optional
 
-
-from stactools.nclimgrid import stac
+from stactools.nclimgrid import cog, stac
 
 
 def test_create_items_not_latest_only() -> None:
-    # This should produce all possible Items (and COGs) from the nc file
-    #   -> should not produce Items (or COGs) for empty placeholder data in the nc file
-    #   -> should overwrite any existing COGs in cog_dir
-
     nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
     cog_dir = "tests/data-files/cog/monthly"
 
-    with TemporaryDirectory() as temp_dir:
-        cog_dir = os.path.join(temp_dir, "cogs")
+    with TemporaryDirectory() as cog_dir:
+        items = stac.create_items(nc_href, cog_dir)
+        assert len(items) == 2
+        for item in items:
+            item.validate()
 
 
 def test_create_items_latest_only() -> None:
     # This should only produce Items (and COGs) for the latest data in the nc file
-    # for which no COGs were found. This is, more or less, a demo of one way to
+    # for which no COGs were found. This is, more or less, a demonstration of one way to
     # handle the in-place updates that are applied to the nc files.
     #   -> should not produce Items (or COGs) for empty placeholder data in the nc file
-    #   -> will need to work backwards in time, checking for COG existence as
-    #      the control on Item and COG creation.
+    #   -> should work backwards in time, checking for COG existence as the control
+    #      on Item and COG creation.
     #   -> should bail once an existing set of COGs is found
     pass
 
 
 def test_create_single_item() -> None:
-    nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
-    cog_hrefs = [
-        "tests/data-files/cog/monthly/nclimgrid-prcp-189501.tif",
-        "tests/data-files/cog/monthly/nclimgrid-tavg-189501.tif",
-        "tests/data-files/cog/monthly/nclimgrid-tmax-189501.tif",
-        "tests/data-files/cog/monthly/nclimgrid-tmin-189501.tif",
-    ]
-    item = stac.create_item(nc_href, cog_hrefs)
-    assert item.id == "test"
-    assert len(item.assets) == 5
+    cog_hrefs = {
+        "prcp": "tests/data-files/cog/monthly/nclimgrid-prcp-189501.tif",
+        "tavg": "tests/data-files/cog/monthly/nclimgrid-tavg-189501.tif",
+        "tmax": "tests/data-files/cog/monthly/nclimgrid-tmax-189501.tif",
+        "tmin": "tests/data-files/cog/monthly/nclimgrid-tmin-189501.tif",
+    }
+    item = stac.create_item(cog_hrefs)
+    assert item.id == "nclimgrid-189501"
+    assert len(item.assets) == 4
     item.validate()
 
 
 def test_create_cog() -> None:
-    nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
-    with TemporaryDirectory() as temp_dir:
-        cog_path = os.path.join(temp_dir, "test_cog.tif")
-        result = stac.cog_nc(nc_href, cog_path, "prcp", 1)
-        assert result == 0
-
-
-# Maybe we should not worry about the problem of the nc files being updated in
-# place. Let the user worry about that. They can use either COG existence and/or
-# Item existence control whether a new Item should be created.
-#   - This will require a public function to create COGs for a single date and a
-#     public function to create a single Item from an nc_href and a list of cog
-#     hrefs.
-# If it is super simple to add to create Items, we can turn this on with a flag
+    nc_hrefs = {
+        "prcp": "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc",
+        "tavg": "tests/data-files/netcdf/monthly/nclimgrid_tavg.nc",
+        "tmax": "tests/data-files/netcdf/monthly/nclimgrid_tmax.nc",
+        "tmin": "tests/data-files/netcdf/monthly/nclimgrid_tmin.nc",
+    }
+    with TemporaryDirectory() as cog_dir:
+        month: Optional[Dict[str, Any]] = {"idx": 1, "date": "189502"}
+        cog_paths = cog.create_cogs(nc_hrefs, cog_dir, month=month)
+        assert len(cog_paths) == 4

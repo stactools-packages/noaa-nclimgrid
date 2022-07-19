@@ -2,7 +2,7 @@ import logging
 import os
 from calendar import monthrange
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import stactools.core.create
 from pystac import Asset, Item, MediaType
@@ -19,7 +19,7 @@ from stactools.nclimgrid.utils import day_indices, month_indices, nc_href_dict
 logger = logging.getLogger(__name__)
 
 
-def create_item(cog_hrefs: List[str], nc_hrefs) -> Item:
+def create_item(cog_hrefs: Dict[str, str]) -> Item:
     basename = os.path.splitext(os.path.basename(cog_hrefs["prcp"]))[0]
     frequency = "Monthly" if basename.startswith("nclimgrid") else "Daily"
 
@@ -72,27 +72,26 @@ def create_items(nc_href: str, cog_dir: str, latest_only: bool = False) -> List[
         days = day_indices(nc_hrefs["prcp"])
         for day in days:
             cog_paths = create_cogs(nc_hrefs, cog_dir, day=day)
-            items.append(create_item(cog_paths, nc_hrefs))
+            items.append(create_item(cog_paths))
 
     else:
         months = month_indices(nc_hrefs["prcp"])
         for month in months:
             cog_paths = create_cogs(nc_hrefs, cog_dir, month=month)
-            items.append(create_item(cog_paths, nc_hrefs))
+            items.append(create_item(cog_paths))
 
     return items
 
-# nc_href = "tests/data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc" 
-# nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
-# nc_href = "https://nclimgridwesteurope.blob.core.windows.net/nclimgrid/nclimgrid-daily/beta/by-month/2022/06/prcp-202206-grd-prelim.nc"
-# nc_href = "/Users/pjh/data/nclimgrid-dev/monthly/nclimgrid_prcp.nc"
-nc_href = "https://e84ai4earth.blob.core.windows.net/nclimgrid/nclimgrid-monthly/nclimgrid_prcp.nc?sv=2020-10-02&st=2022-07-18T21%3A31%3A19Z&se=2022-12-19T22%3A31%3A00Z&sr=c&sp=racwdxlt&sig=dPkXcbmMAGd0DdwbYY7DMfULeiTSCXXS1KfisER3RvA%3D"
 
-cog_dir = "/Users/pjh/dev/nclimgrid/pjh/test_cogs"
+# # nc_href = "tests/data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
+# # nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
+# # nc_href = "https://nclimgridwesteurope.blob.core.windows.net/nclimgrid/nclimgrid-daily/beta/by-month/2022/06/prcp-202206-grd-prelim.nc"  # noqa
+# # nc_href = "/Users/pjh/data/nclimgrid-dev/monthly/nclimgrid_prcp.nc"
+# nc_href = "https://e84ai4earth.blob.core.windows.net/nclimgrid/nclimgrid-monthly/nclimgrid_prcp.nc?sv=2020-10-02&st=2022-07-18T21%3A31%3A19Z&se=2022-12-19T22%3A31%3A00Z&sr=c&sp=racwdxlt&sig=dPkXcbmMAGd0DdwbYY7DMfULeiTSCXXS1KfisER3RvA%3D"  # noqa
+# cog_dir = "/Users/pjh/dev/nclimgrid/pjh/test_cogs"
 
-items = create_items(nc_href, cog_dir)
-
-import json
-for item in items:
-    with open(f"pjh/test_items/{item.id}.json", "w") as f:
-        json.dump(item.to_dict(), f)
+# items = create_items(nc_href, cog_dir)
+# import json
+# for item in items:
+#     with open(f"pjh/test_items/{item.id}.json", "w") as f:
+#         json.dump(item.to_dict(), f)

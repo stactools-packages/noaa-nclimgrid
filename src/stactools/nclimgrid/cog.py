@@ -1,13 +1,13 @@
 import os
-from typing import Dict, Optional
-from urllib.parse import urlparse
 import warnings
+from typing import Any, Dict, Optional
+from urllib.parse import urlparse
 
+import numpy as np
 import rasterio
 import rasterio.shutil
-from rasterio.io import MemoryFile
 from rasterio.errors import NotGeoreferencedWarning
-import numpy as np
+from rasterio.io import MemoryFile
 
 from stactools.nclimgrid.constants import VARS
 
@@ -51,14 +51,19 @@ def create_cogs(
     nc_hrefs: Dict[str, str],
     cog_dir: str,
     day: Optional[int] = None,
-    month: Optional[Dict[str, str]] = None,
+    month: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, str]:
     cog_paths = {}
     if day:
         nc_index = day
-        basenames = {var: os.path.splitext(os.path.basename(nc_hrefs[var]))[0] for var in VARS}
-        cog_paths = {var: os.path.join(cog_dir, f"{basenames[var]}-{day:02d}.tif") for var in VARS}
-    else:
+        basenames = {
+            var: os.path.splitext(os.path.basename(nc_hrefs[var]))[0] for var in VARS
+        }
+        cog_paths = {
+            var: os.path.join(cog_dir, f"{basenames[var]}-{day:02d}.tif")
+            for var in VARS
+        }
+    elif month:
         nc_index = month["idx"]
         filenames = {var: f"nclimgrid-{var}-{month['date']}.tif" for var in VARS}
         cog_paths = {var: os.path.join(cog_dir, filenames[var]) for var in VARS}
@@ -70,5 +75,16 @@ def create_cogs(
     for var in VARS:
         augmented_nc_href = f"netcdf:{nc_hrefs[var]}{mode}:{var}"
         cogify(augmented_nc_href, cog_paths[var], nc_index)
-    
+
     return cog_paths
+
+
+# TODO: Make corrections to address these warnings:
+# WARNING  rasterio._env:io.py:140 CPLE_NotSupported in driver GTiff does not support creation option BLOCKSIZE  # noqa
+# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option CRS  # noqa
+# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option NODATA  # noqa
+# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option COUNT  # noqa
+# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option TRANSFORM  # noqa
+# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option WIDTH  # noqa
+# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option HEIGHT  # noqa
+# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option DTYPE  # noqa
