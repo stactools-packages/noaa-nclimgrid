@@ -1,3 +1,4 @@
+import operator
 import os
 from typing import Any, Dict, List, Tuple
 from urllib.parse import urlparse
@@ -34,8 +35,8 @@ def day_indices(nc_href: str) -> List[int]:
         href += "#mode=bytes"
 
     with xarray.open_dataset(href) as dataset:
-        min_prcp = dataset.prcp.min(dim=("lat", "lon"), skipna=True)
-        days = sum(min_prcp >= 0).values
+        min_prcp = dataset.prcp.min(dim=("lat", "lon"), skipna=True).values
+        days = sum(min_prcp >= 0)
 
     return list(range(days, 0, -1))
 
@@ -53,6 +54,6 @@ def month_indices(nc_href: str) -> List[Dict[str, Any]]:
     for idx, (year, month) in enumerate(zip(years, months), start=1):
         idx_month.append({"idx": idx, "date": f"{year}{month:02d}"})
 
-    idx_month = sorted(idx_month, key=lambda month: month["idx"], reverse=True)
+    idx_month.sort(key=operator.itemgetter("idx"), reverse=True)
 
     return idx_month
