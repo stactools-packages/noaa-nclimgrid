@@ -1,6 +1,6 @@
 import operator
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 from urllib.parse import urlparse
 
 import xarray
@@ -8,23 +8,26 @@ import xarray
 from stactools.nclimgrid.constants import VARS
 
 
-def nc_href_dict(nc_href: str) -> Tuple[Dict[str, str], bool]:
+def data_frequency(href: str) -> str:
+    basename = os.path.splitext(os.path.basename(href))[0]
+    frequency = "Monthly" if basename.startswith("nclimgrid") else "Daily"
+    return frequency
+
+
+def nc_href_dict(nc_href: str) -> Dict[str, str]:
     base, filename = os.path.split(nc_href)
 
     if "nclimgrid" in filename:  # monthly
         filenames = {var: f"{filename[0:10]}{var}{filename[14:]}" for var in VARS}
-        daily = False
     elif "ncdd" in filename:  # daily pre-1970
         filenames = {var: filename for var in VARS}
-        daily = True
     else:  # daily 1970-onward
         suffix = filename[4:]
         filenames = {var: f"{var}{suffix}" for var in VARS}
-        daily = True
 
     href_dict = {var: os.path.join(base, f) for var, f in filenames.items()}
 
-    return (href_dict, daily)
+    return href_dict
 
 
 def day_indices(nc_href: str) -> List[int]:

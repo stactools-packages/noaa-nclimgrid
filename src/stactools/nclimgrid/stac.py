@@ -14,14 +14,19 @@ from stactools.nclimgrid.constants import (
     RASTER_EXTENSION_V11,
     VARS,
 )
-from stactools.nclimgrid.utils import day_indices, month_indices, nc_href_dict
+from stactools.nclimgrid.utils import (
+    data_frequency,
+    day_indices,
+    month_indices,
+    nc_href_dict,
+)
 
 logger = logging.getLogger(__name__)
 
 
 def create_item(cog_hrefs: Dict[str, str]) -> Item:
+    frequency = data_frequency(cog_hrefs["prcp"])
     basename = os.path.splitext(os.path.basename(cog_hrefs["prcp"]))[0]
-    frequency = "Monthly" if basename.startswith("nclimgrid") else "Daily"
 
     nominal_datetime: Optional[datetime] = None
     if frequency == "Daily":
@@ -65,10 +70,11 @@ def create_item(cog_hrefs: Dict[str, str]) -> Item:
 
 
 def create_items(nc_href: str, cog_dir: str, latest_only: bool = False) -> List[Item]:
-    nc_hrefs, daily = nc_href_dict(nc_href)
+    frequency = data_frequency(nc_href)
+    nc_hrefs = nc_href_dict(nc_href)
 
     items = []
-    if daily:
+    if frequency == "Daily":
         days = day_indices(nc_hrefs["prcp"])
         for day in days:
             cog_paths = create_cogs(nc_hrefs, cog_dir, day=day)
