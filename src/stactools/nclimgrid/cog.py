@@ -13,14 +13,15 @@ from stactools.nclimgrid.constants import VARS
 
 TRANSFORM = [0.04166667, 0.0, -124.70833333, 0.0, -0.04166667, 49.37500127]
 
-BASE_PROFILE = {
-    "compress": "deflate",
-    "blocksize": 512,
+GTIFF_PROFILE = {
     "crs": "epsg:4326",
     "nodata": np.nan,
     "count": 1,
     "transform": rasterio.Affine(*TRANSFORM),
+    "driver": "GTiff",
 }
+
+COG_PROFILE = {"compress": "deflate", "blocksize": 512, "driver": "COG"}
 
 
 def cogify(
@@ -32,7 +33,7 @@ def cogify(
     with rasterio.open(nc_file) as src:
         single_band = src.read(nc_index)
 
-        profile = BASE_PROFILE.copy()
+        profile = GTIFF_PROFILE.copy()
         profile.update(
             {
                 "width": src.width,
@@ -42,9 +43,10 @@ def cogify(
         )
 
         with MemoryFile() as mem:
-            with mem.open(**profile, driver="GTiff") as temp:
+            with mem.open(**profile) as temp:
                 temp.write(single_band, 1)
-                rasterio.shutil.copy(temp, cog_file, **profile, driver="COG")
+                profile.update
+                rasterio.shutil.copy(temp, cog_file, **COG_PROFILE)
 
 
 def create_cogs(
@@ -77,14 +79,3 @@ def create_cogs(
         cogify(augmented_nc_href, cog_paths[var], nc_index)
 
     return cog_paths
-
-
-# TODO: Make corrections to address these warnings:
-# WARNING  rasterio._env:io.py:140 CPLE_NotSupported in driver GTiff does not support creation option BLOCKSIZE  # noqa
-# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option CRS  # noqa
-# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option NODATA  # noqa
-# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option COUNT  # noqa
-# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option TRANSFORM  # noqa
-# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option WIDTH  # noqa
-# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option HEIGHT  # noqa
-# WARNING  rasterio._env:env.py:442 CPLE_NotSupported in driver COG does not support creation option DTYPE  # noqa
