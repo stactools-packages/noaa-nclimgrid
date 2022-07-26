@@ -76,12 +76,14 @@ def create_items(nc_href: str, cog_dir: str, latest_only: bool = False) -> List[
     items = []
     if frequency == "Daily":
         days = day_indices(nc_hrefs["prcp"])
+        print(days)
         for day in days:
             cog_paths = create_cogs(nc_hrefs, cog_dir, day=day)
             items.append(create_item(cog_paths))
 
     else:
         months = month_indices(nc_hrefs["prcp"])
+        print(months)
         for month in months:
             cog_paths = create_cogs(nc_hrefs, cog_dir, month=month)
             items.append(create_item(cog_paths))
@@ -90,12 +92,17 @@ def create_items(nc_href: str, cog_dir: str, latest_only: bool = False) -> List[
 
 
 # # nc_href = "tests/data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
+# # nc_href = "tests/data-files/netcdf/daily/beta/by-month/1951/01/ncdd-195101-grd-scaled.nc"
 # # nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
-# # nc_href = "https://nclimgridwesteurope.blob.core.windows.net/nclimgrid/nclimgrid-daily/beta/by-month/2022/06/prcp-202206-grd-prelim.nc"  # noqa
-# # nc_href = "/Users/pjh/data/nclimgrid-dev/monthly/nclimgrid_prcp.nc"
-# nc_href = "https://e84ai4earth.blob.core.windows.net/nclimgrid/nclimgrid-monthly/nclimgrid_prcp.nc?sv=2020-10-02&st=2022-07-18T21%3A31%3A19Z&se=2022-12-19T22%3A31%3A00Z&sr=c&sp=racwdxlt&sig=dPkXcbmMAGd0DdwbYY7DMfULeiTSCXXS1KfisER3RvA%3D"  # noqa
-# cog_dir = "/Users/pjh/dev/nclimgrid/pjh/test_cogs"
 
+# nc_href = "https://nclimgridwesteurope.blob.core.windows.net/nclimgrid/nclimgrid-daily/beta/by-month/2022/06/prcp-202206-grd-prelim.nc"  # noqa
+# # nc_href = "https://nclimgridwesteurope.blob.core.windows.net/nclimgrid/nclimgrid-daily/beta/by-month/2022/06/prcp-202206-grd-scaled.nc"  # noqa
+# # nc_href = "https://nclimgridwesteurope.blob.core.windows.net/nclimgrid/nclimgrid-monthly/nclimgrid_prcp.nc"
+
+# # nc_href = "https://e84ai4earth.blob.core.windows.net/nclimgrid/nclimgrid-monthly/nclimgrid_prcp.nc?sv=2020-10-02&st=2022-07-18T21%3A31%3A19Z&se=2022-12-19T22%3A31%3A00Z&sr=c&sp=racwdxlt&sig=dPkXcbmMAGd0DdwbYY7DMfULeiTSCXXS1KfisER3RvA%3D"  # noqa
+
+
+# cog_dir = "/Users/pjh/dev/nclimgrid/pjh/test_cogs"
 # items = create_items(nc_href, cog_dir)
 # import json
 # for item in items:

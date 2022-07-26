@@ -1,9 +1,9 @@
 import operator
 import os
 from typing import Any, Dict, List
-from urllib.parse import urlparse
 
 import xarray
+import fsspec
 
 from stactools.nclimgrid.constants import VARS
 
@@ -31,25 +31,19 @@ def nc_href_dict(nc_href: str) -> Dict[str, str]:
 
 
 def day_indices(nc_href: str) -> List[int]:
-    href = nc_href
-    if urlparse(nc_href).scheme.startswith("http"):
-        href += "#mode=bytes"
-
-    with xarray.open_dataset(href) as dataset:
-        min_prcp = dataset.prcp.min(dim=("lat", "lon"), skipna=True).values
-        days = sum(min_prcp >= 0)
+    with fsspec.open(nc_href) as fobj:
+        with xarray.open_dataset(fobj) as dataset:
+            min_prcp = dataset.prcp.min(dim=("lat", "lon"), skipna=True).values
+            days = sum(min_prcp >= 0)
 
     return list(range(days, 0, -1))
 
 
 def month_indices(nc_href: str) -> List[Dict[str, Any]]:
-    href = nc_href
-    if urlparse(nc_href).scheme.startswith("http"):
-        href += "#mode=bytes"
-
-    with xarray.open_dataset(href) as ds:
-        years = ds.time.dt.year.data.tolist()
-        months = ds.time.dt.month.data.tolist()
+    with fsspec.open(nc_href) as fobj:
+        with xarray.open_dataset(fobj) as ds:
+            years = ds.time.dt.year.data.tolist()
+            months = ds.time.dt.month.data.tolist()
 
     idx_month = []
     for idx, (year, month) in enumerate(zip(years, months), start=1):
