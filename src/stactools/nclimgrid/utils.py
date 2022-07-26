@@ -2,8 +2,8 @@ import operator
 import os
 from typing import Any, Dict, List
 
-import xarray
 import fsspec
+import xarray
 
 from stactools.nclimgrid.constants import VARS
 
@@ -15,15 +15,14 @@ def data_frequency(href: str) -> str:
 
 
 def nc_href_dict(nc_href: str) -> Dict[str, str]:
+    frequency = data_frequency(nc_href)
     base, filename = os.path.split(nc_href)
 
-    if "nclimgrid" in filename:  # monthly
-        filenames = {var: f"{filename[0:10]}{var}{filename[14:]}" for var in VARS}
-    elif "ncdd" in filename:  # daily pre-1970
-        filenames = {var: filename for var in VARS}
-    else:  # daily 1970-onward
+    if frequency == "Daily":
         suffix = filename[4:]
         filenames = {var: f"{var}{suffix}" for var in VARS}
+    else:
+        filenames = {var: f"nclimgrid_{var}{filename[14:]}" for var in VARS}
 
     href_dict = {var: os.path.join(base, f) for var, f in filenames.items()}
 
