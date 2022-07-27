@@ -1,0 +1,128 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "nclimgrid-189502",
+  "properties": {
+    "proj:epsg": 4326,
+    "proj:transform": [
+      0.04166667,
+      0.0,
+      -124.70833333,
+      0.0,
+      -0.04166667,
+      49.37500127
+    ],
+    "proj:shape": [
+      596,
+      1385
+    ],
+    "start_datetime": "1895-02-01T00:00:00Z",
+    "end_datetime": "1895-02-28T23:59:59Z",
+    "created": "2022-07-27T16:13:23.479005Z",
+    "datetime": null
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -66.999995,
+          24.541666
+        ],
+        [
+          -66.999995,
+          49.375001
+        ],
+        [
+          -124.708333,
+          49.375001
+        ],
+        [
+          -124.708333,
+          24.541666
+        ],
+        [
+          -66.999995,
+          24.541666
+        ]
+      ]
+    ]
+  },
+  "links": [],
+  "assets": {
+    "prcp": {
+      "href": "../cogs/nclimgrid-prcp-189502.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Monthly Precipitation (mm)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "mm",
+          "spatial_resolution": 5000
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "tavg": {
+      "href": "../cogs/nclimgrid-tavg-189502.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Monthly Average Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "tmax": {
+      "href": "../cogs/nclimgrid-tmax-189502.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Monthly Maximmum Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "tmin": {
+      "href": "../cogs/nclimgrid-tmin-189502.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Monthly Minimum Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "bbox": [
+    -124.708333,
+    24.541666,
+    -66.999995,
+    49.375001
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ]
+}
