@@ -95,3 +95,23 @@ def test_read_href_modifier() -> None:
     with TemporaryDirectory() as cog_dir:
         _ = stac.create_items(nc_href, cog_dir, read_href_modifier=read_href_modifier)
         assert did_it
+
+
+def test_daily_collection() -> None:
+    collection = stac.create_collection("Daily")
+    collection_dict = collection.to_dict()
+    assert collection.id == "nclimgrid-daily"
+    assert "sci:doi" not in collection_dict
+    assert "sci:citation" not in collection_dict
+    assert "sci:publications" not in collection_dict
+    assert collection_dict["item_assets"]["prcp"]["title"].startswith("Daily")
+
+
+def test_monthly_collection() -> None:
+    collection = stac.create_collection("Monthly")
+    collection_dict = collection.to_dict()
+    assert collection.id == "nclimgrid-monthly"
+    assert "sci:doi" in collection_dict
+    assert "sci:citation" in collection_dict
+    assert "sci:publications" in collection_dict
+    assert collection_dict["item_assets"]["prcp"]["title"].startswith("Monthly")

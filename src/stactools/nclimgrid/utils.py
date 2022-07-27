@@ -4,8 +4,9 @@ from typing import Any, Dict, List
 
 import fsspec
 import xarray
+from pystac import MediaType
 
-from stactools.nclimgrid.constants import VARS
+from stactools.nclimgrid.constants import ASSET_TITLES, RASTER_BANDS, VARS
 
 
 def data_frequency(href: str) -> str:
@@ -51,3 +52,12 @@ def month_indices(nc_href: str) -> List[Dict[str, Any]]:
     idx_month.sort(key=operator.itemgetter("idx"), reverse=True)
 
     return idx_month
+
+
+def asset_dict(frequency: str, var: str) -> Dict[str, Any]:
+    return {
+        "media_type": MediaType.COG,
+        "roles": ["data"],
+        "title": f"{frequency} {ASSET_TITLES[var]}",
+        "raster:bands": RASTER_BANDS[var],
+    }

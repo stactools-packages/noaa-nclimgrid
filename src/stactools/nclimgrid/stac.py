@@ -5,18 +5,17 @@ from datetime import datetime, timezone
 from typing import Callable, Dict, List, Optional
 
 import stactools.core.create
-from pystac import Asset, Item, MediaType
+from pystac import Asset, Collection, Item
+from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
+from pystac.extensions.scientific import ScientificExtension
 from pystac.utils import make_absolute_href
 from stactools.core.io import ReadHrefModifier
 
+from stactools.nclimgrid import constants
 from stactools.nclimgrid.cog import create_cogs
-from stactools.nclimgrid.constants import (
-    ASSET_TITLES,
-    RASTER_BANDS,
-    RASTER_EXTENSION_V11,
-    VARS,
-)
+from stactools.nclimgrid.constants import VARS
 from stactools.nclimgrid.utils import (
+    asset_dict,
     data_frequency,
     day_indices,
     month_indices,
@@ -56,17 +55,11 @@ def create_item(cog_hrefs: Dict[str, str]) -> Item:
 
     item.assets.pop("data")
     for var in VARS:
-        item.add_asset(
-            var,
-            Asset(
-                href=make_absolute_href(cog_hrefs[var]),
-                media_type=MediaType.COG,
-                roles=["data"],
-                title=f"{frequency} {ASSET_TITLES[var]}",
-                extra_fields={"raster:bands": RASTER_BANDS[var]},
-            ),
-        )
-    item.stac_extensions.append(RASTER_EXTENSION_V11)
+        asset = asset_dict(frequency, var)
+        asset["href"] = make_absolute_href(cog_hrefs[var])
+        item.add_asset(var, Asset.from_dict(asset))
+
+    item.stac_extensions.append(constants.RASTER_EXTENSION_V11)
 
     return item
 
@@ -89,21 +82,41 @@ def create_items(
     if frequency == "Daily":
         days = day_indices(read_nc_hrefs["prcp"])
         for day in days:
-            if existence_checker:
-                item_id = "todo"
-                if existence_checker(item_id):
-                    return items
+            # TODO: existence checker here
             cog_paths = create_cogs(read_nc_hrefs, cog_dir, day=day)
             items.append(create_item(cog_paths))
 
     else:
         months = month_indices(read_nc_hrefs["prcp"])
         for month in months:
-            if existence_checker:
-                item_id = "todo"
-                if existence_checker(item_id):
-                    return items
+            # TODO: existence checker here
             cog_paths = create_cogs(read_nc_hrefs, cog_dir, month=month)
             items.append(create_item(cog_paths))
 
     return items
+
+
+def create_collection(frequency: str) -> Collection:
+    if frequency == "Monthly":
+        collection = Collection(**constants.MONTHLY_COLLECTION)
+
+        ScientificExtension.add_to(collection)
+        collection.extra_fields["sci:doi"] = constants.MONTHLY_DATA_DOI
+        collection.extra_fields["sci:citation"] = constants.MONTHLY_DATA_CITATION
+        collection.extra_fields["sci:publications"] = constants.MONTHLY_DATA_PUBLICATION
+        collection.add_link(constants.MONTHLY_DATA_LINK)
+
+    else:
+        collection = Collection(**constants.DAILY_COLLECTION)
+
+    item_assets = {}
+    for var in VARS:
+        item_assets[var] = AssetDefinition(asset_dict(frequency, var))
+    item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
+    item_assets_ext.item_assets = item_assets
+
+    collection.stac_extensions.append(constants.RASTER_EXTENSION_V11)
+
+    collection.add_link(constants.LICENSE_LINK)
+
+    return collection
