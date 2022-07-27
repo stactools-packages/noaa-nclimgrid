@@ -6,6 +6,7 @@ from typing import Callable, Dict, List, Optional
 
 import stactools.core.create
 from pystac import Asset, Item, MediaType
+from pystac.utils import make_absolute_href
 from stactools.core.io import ReadHrefModifier
 
 from stactools.nclimgrid.cog import create_cogs
@@ -43,7 +44,7 @@ def create_item(cog_hrefs: Dict[str, str]) -> Item:
         year = int(id[-6:-2])
         month = int(id[-2:])
         start_datetime = datetime(year, month, 1)
-        end_datetime = datetime(year, month, monthrange(year, month)[1])
+        end_datetime = datetime(year, month, monthrange(year, month)[1], 23, 59, 59)
         nominal_datetime = None
 
     item = stactools.core.create.item(cog_hrefs["prcp"])
@@ -58,7 +59,7 @@ def create_item(cog_hrefs: Dict[str, str]) -> Item:
         item.add_asset(
             var,
             Asset(
-                href=cog_hrefs[var],
+                href=make_absolute_href(cog_hrefs[var]),
                 media_type=MediaType.COG,
                 roles=["data"],
                 title=f"{frequency} {ASSET_TITLES[var]}",

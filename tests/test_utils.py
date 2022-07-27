@@ -8,9 +8,9 @@ def test_day_indices_local() -> None:
 
 
 def test_day_indices_remote() -> None:
-    nc_href = "https://nclimgridwesteurope.blob.core.windows.net/nclimgrid/nclimgrid-daily/beta/by-month/2022/06/prcp-202206-grd-scaled.nc"  # noqa
+    nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/daily/prcp-202201-grd-prelim.nc"  # noqa
     idx = utils.day_indices(nc_href)
-    assert len(idx) == 30
+    assert len(idx) == 1
 
 
 def test_month_indices_local() -> None:
@@ -20,6 +20,6 @@ def test_month_indices_local() -> None:
 
 
 def test_month_indices_remote() -> None:
-    nc_href = "https://nclimgridwesteurope.blob.core.windows.net/nclimgrid/nclimgrid-monthly/nclimgrid_prcp.nc"  # noqa
+    nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/monthly/nclimgrid_prcp.nc"  # noqa
     idx = utils.month_indices(nc_href)
-    assert len(idx) == 1530
+    assert len(idx) == 2
