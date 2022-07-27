@@ -4,10 +4,8 @@ from typing import Any, Dict, Optional
 from stactools.nclimgrid import cog, stac
 
 
-def test_create_items_not_latest_only() -> None:
+def test_create_monthly_items_local() -> None:
     nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
-    cog_dir = "tests/data-files/cog/monthly"
-
     with TemporaryDirectory() as cog_dir:
         items = stac.create_items(nc_href, cog_dir)
         assert len(items) == 2
@@ -15,7 +13,34 @@ def test_create_items_not_latest_only() -> None:
             item.validate()
 
 
-def test_create_items_latest_only() -> None:
+def test_create_monthly_items_remote() -> None:
+    nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/monthly/nclimgrid_prcp.nc"  # noqa
+    with TemporaryDirectory() as cog_dir:
+        items = stac.create_items(nc_href, cog_dir)
+        assert len(items) == 2
+        for item in items:
+            item.validate()
+
+
+def test_create_daily_items_local() -> None:
+    nc_href = "tests/data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"  # noqa
+    with TemporaryDirectory() as cog_dir:
+        items = stac.create_items(nc_href, cog_dir)
+        assert len(items) == 1
+        for item in items:
+            item.validate()
+
+
+def test_create_daily_items_remote() -> None:
+    nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/daily/prcp-202201-grd-prelim.nc"  # noqa
+    with TemporaryDirectory() as cog_dir:
+        items = stac.create_items(nc_href, cog_dir)
+        assert len(items) == 1
+        for item in items:
+            item.validate()
+
+
+def test_create_monthly_items_latest_only() -> None:
     # This should only produce Items (and COGs) for the latest data in the nc file
     # for which no COGs were found. This is, more or less, a demonstration of one way to
     # handle the in-place updates that are applied to the nc files.
@@ -23,6 +48,11 @@ def test_create_items_latest_only() -> None:
     #   -> should work backwards in time, checking for COG existence as the control
     #      on Item and COG creation.
     #   -> should bail once an existing set of COGs is found
+    # I think it's OK to only test this on local data
+    pass
+
+
+def test_create_daily_items_latest_only() -> None:
     pass
 
 
@@ -39,7 +69,7 @@ def test_create_single_item() -> None:
     item.validate()
 
 
-def test_create_cog() -> None:
+def test_create_cogs() -> None:
     nc_hrefs = {
         "prcp": "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc",
         "tavg": "tests/data-files/netcdf/monthly/nclimgrid_tavg.nc",
