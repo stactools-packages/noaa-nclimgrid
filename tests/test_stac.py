@@ -80,3 +80,18 @@ def test_create_cogs() -> None:
         month: Optional[Dict[str, Any]] = {"idx": 1, "date": "189502"}
         cog_paths = cog.create_cogs(nc_hrefs, cog_dir, month=month)
         assert len(cog_paths) == 4
+
+
+def test_read_href_modifier() -> None:
+    nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
+
+    did_it = False
+
+    def read_href_modifier(href: str) -> str:
+        nonlocal did_it
+        did_it = True
+        return href
+
+    with TemporaryDirectory() as cog_dir:
+        _ = stac.create_items(nc_href, cog_dir, read_href_modifier=read_href_modifier)
+        assert did_it

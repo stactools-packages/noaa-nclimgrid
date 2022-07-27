@@ -6,6 +6,7 @@ from typing import Dict, List, Optional
 
 import stactools.core.create
 from pystac import Asset, Item, MediaType
+from stactools.core.io import ReadHrefModifier
 
 from stactools.nclimgrid.cog import create_cogs
 from stactools.nclimgrid.constants import (
@@ -69,21 +70,31 @@ def create_item(cog_hrefs: Dict[str, str]) -> Item:
     return item
 
 
-def create_items(nc_href: str, cog_dir: str, latest_only: bool = False) -> List[Item]:
+def create_items(
+    nc_href: str,
+    cog_dir: str,
+    latest_only: bool = False,
+    read_href_modifier: Optional[ReadHrefModifier] = None,
+) -> List[Item]:
     frequency = data_frequency(nc_href)
     nc_hrefs = nc_href_dict(nc_href)
 
+    if read_href_modifier:
+        read_nc_hrefs = {var: read_href_modifier(nc_hrefs[var]) for var in VARS}
+    else:
+        read_nc_hrefs = nc_hrefs
+
     items = []
     if frequency == "Daily":
-        days = day_indices(nc_hrefs["prcp"])
+        days = day_indices(read_nc_hrefs["prcp"])
         for day in days:
-            cog_paths = create_cogs(nc_hrefs, cog_dir, day=day)
+            cog_paths = create_cogs(read_nc_hrefs, cog_dir, day=day)
             items.append(create_item(cog_paths))
 
     else:
-        months = month_indices(nc_hrefs["prcp"])
+        months = month_indices(read_nc_hrefs["prcp"])
         for month in months:
-            cog_paths = create_cogs(nc_hrefs, cog_dir, month=month)
+            cog_paths = create_cogs(read_nc_hrefs, cog_dir, month=month)
             items.append(create_item(cog_paths))
 
     return items
