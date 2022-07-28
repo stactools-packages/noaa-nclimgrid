@@ -19,7 +19,7 @@ A stactools package for [NClimGrid](https://www.ncei.noaa.gov/access/metadata/la
 - Minimum temperature (tmin) in degrees Celsius
 - Maximum temperature (tmax) in degrees Celsius
 
-The source monthly data is aggregated into into four netCDF files, one for each variable, and dates back to 1895. Each netCDF file is updated in place when data for a new month is available. The source daily data is aggregated into monthly netCDF files, with one file for each of the four variables, and dates back to 1951. The netCDF files for the current month are updated in place when data for a new day is available.
+The source monthly data is aggregated into four netCDF files, one for each variable, and dates back to 1895. Each monthly netCDF file is updated in place when data for a new month is available. The source daily data is aggregated into monthly netCDF files, with one file for each of the four variables, and dates back to 1951. The netCDF files for the current month of daily data are updated in place when data for a new day is available.
 
 ## STAC Examples
 
