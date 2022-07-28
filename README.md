@@ -52,7 +52,7 @@ $ stac nclimgrid create-collection <text file path> <output directory>
 
 For example, the monthly Collection, Items, and COGs found in the `examples/monthly` directory can be created with:
 ```shell
-$ stac nclimgrid create-collection examples/file-list-monthly.txt
+$ stac nclimgrid create-collection examples/file-list-monthly.txt examples
 ```
 
 ## Contributing
