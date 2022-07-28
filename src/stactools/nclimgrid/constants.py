@@ -1,7 +1,14 @@
 from datetime import datetime, timezone
+from enum import Enum
 from typing import Any, Dict
 
 from pystac import Extent, Link, SpatialExtent, TemporalExtent
+
+
+class Frequency(str, Enum):
+    DAILY = "daily"
+    MONTHLY = "monthly"
+
 
 VARS = ["prcp", "tavg", "tmax", "tmin"]
 

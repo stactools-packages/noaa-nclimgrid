@@ -13,26 +13,6 @@ class CommandsTest(CliTestCase):
     def create_subcommand_functions(self) -> List[Callable[[Group], Command]]:
         return [create_nclimgrid_command]
 
-    # def test_create_collection(self) -> None:
-    #     with TemporaryDirectory() as tmp_dir:
-    #         # Run your custom create-collection command and validate
-
-    #         # Example:
-    #         destination = os.path.join(tmp_dir, "collection.json")
-
-    #         result = self.run_command(f"ephemeralcmd create-collection {destination}")
-
-    #         assert result.exit_code == 0, "\n{}".format(result.output)
-
-    #         jsons = [p for p in os.listdir(tmp_dir) if p.endswith(".json")]
-    #         assert len(jsons) == 1
-
-    #         collection = pystac.read_file(destination)
-    #         assert collection.id == "my-collection-id"
-    #         # assert collection.other_attr...
-
-    #         collection.validate()
-
     def test_create_monthly_items(self) -> None:
         nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
         with TemporaryDirectory() as tmp_dir:
@@ -72,12 +52,12 @@ class CommandsTest(CliTestCase):
             cmd = f"nclimgrid create-collection {file_list_path} {tmp_dir}"
             self.run_command(cmd)
 
-            item_paths = ["Monthly/nclimgrid-189501", "Monthly/nclimgrid-189502"]
+            item_paths = ["monthly/nclimgrid-189501", "monthly/nclimgrid-189502"]
             for item_path in item_paths:
                 item_files = glob.glob(f"{tmp_dir}/{item_path}/*.json")
                 assert len(item_files) == 1
                 cog_files = glob.glob(f"{tmp_dir}/{item_path}/*.tif")
                 assert len(cog_files) == 4
 
-            collection = pystac.read_file(f"{tmp_dir}/Monthly/collection.json")
+            collection = pystac.read_file(f"{tmp_dir}/monthly/collection.json")
             collection.validate()

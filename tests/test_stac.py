@@ -98,7 +98,7 @@ def test_read_href_modifier() -> None:
 
 
 def test_daily_collection() -> None:
-    collection = stac.create_collection("Daily")
+    collection = stac.create_collection("daily")
     collection_dict = collection.to_dict()
     assert collection.id == "nclimgrid-daily"
     assert "sci:doi" not in collection_dict
@@ -108,7 +108,7 @@ def test_daily_collection() -> None:
 
 
 def test_monthly_collection() -> None:
-    collection = stac.create_collection("Monthly")
+    collection = stac.create_collection("monthly")
     collection_dict = collection.to_dict()
     assert collection.id == "nclimgrid-monthly"
     assert "sci:doi" in collection_dict

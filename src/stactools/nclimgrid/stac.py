@@ -13,7 +13,7 @@ from stactools.core.io import ReadHrefModifier
 
 from stactools.nclimgrid import constants
 from stactools.nclimgrid.cog import create_cogs
-from stactools.nclimgrid.constants import VARS
+from stactools.nclimgrid.constants import VARS, Frequency
 from stactools.nclimgrid.utils import (
     asset_dict,
     data_frequency,
@@ -30,7 +30,7 @@ def create_item(cog_hrefs: Dict[str, str]) -> Item:
     basename = os.path.splitext(os.path.basename(cog_hrefs["prcp"]))[0]
 
     nominal_datetime: Optional[datetime] = None
-    if frequency == "Daily":
+    if frequency == Frequency.DAILY:
         id = basename[5:]
         year = int(id[0:4])
         month = int(id[4:6])
@@ -55,7 +55,7 @@ def create_item(cog_hrefs: Dict[str, str]) -> Item:
 
     item.assets.pop("data")
     for var in VARS:
-        asset = asset_dict(frequency, var)
+        asset = asset_dict(frequency.value, var)
         asset["href"] = make_absolute_href(cog_hrefs[var])
         item.add_asset(var, Asset.from_dict(asset))
 
@@ -79,7 +79,7 @@ def create_items(
         read_nc_hrefs = nc_hrefs
 
     items: List[Item] = []
-    if frequency == "Daily":
+    if frequency == Frequency.DAILY:
         days = day_indices(read_nc_hrefs["prcp"])
         for day in days:
             # TODO: existence checker here
@@ -97,7 +97,7 @@ def create_items(
 
 
 def create_collection(frequency: str) -> Collection:
-    if frequency == "Monthly":
+    if frequency == Frequency.MONTHLY:
         collection = Collection(**constants.MONTHLY_COLLECTION)
 
         ScientificExtension.add_to(collection)

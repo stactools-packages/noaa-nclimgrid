@@ -47,7 +47,7 @@ def create_nclimgrid_command(cli: Group) -> Command:
             hrefs = [os.path.abspath(line.strip()) for line in f.readlines()]
 
         items = []
-        frequency = data_frequency(hrefs[0])
+        frequency = data_frequency(hrefs[0]).value
         with TemporaryDirectory() as cog_dir:
             for href in hrefs:
                 temp_items = stac.create_items(href, cog_dir)
@@ -61,7 +61,9 @@ def create_nclimgrid_command(cli: Group) -> Command:
 
             collection.add_items(items)
             collection.update_extent_from_items()
-            move_all_assets(collection)
+            move_all_assets(
+                collection,
+            )
 
         collection.validate_all()
         collection.save()

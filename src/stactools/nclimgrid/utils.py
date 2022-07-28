@@ -6,12 +6,14 @@ import fsspec
 import xarray
 from pystac import MediaType
 
-from stactools.nclimgrid.constants import ASSET_TITLES, RASTER_BANDS, VARS
+from stactools.nclimgrid.constants import ASSET_TITLES, RASTER_BANDS, VARS, Frequency
 
 
-def data_frequency(href: str) -> str:
+def data_frequency(href: str) -> Frequency:
     basename = os.path.splitext(os.path.basename(href))[0]
-    frequency = "Monthly" if basename.startswith("nclimgrid") else "Daily"
+    frequency = (
+        Frequency.MONTHLY if basename.startswith("nclimgrid") else Frequency.DAILY
+    )
     return frequency
 
 
@@ -19,7 +21,7 @@ def nc_href_dict(nc_href: str) -> Dict[str, str]:
     frequency = data_frequency(nc_href)
     base, filename = os.path.split(nc_href)
 
-    if frequency == "Daily":
+    if frequency == Frequency.DAILY:
         suffix = filename[4:]
         filenames = {var: f"{var}{suffix}" for var in VARS}
     else:
@@ -58,6 +60,6 @@ def asset_dict(frequency: str, var: str) -> Dict[str, Any]:
     return {
         "media_type": MediaType.COG,
         "roles": ["data"],
-        "title": f"{frequency} {ASSET_TITLES[var]}",
+        "title": f"{frequency.capitalize()} {ASSET_TITLES[var]}",
         "raster:bands": RASTER_BANDS[var],
     }
