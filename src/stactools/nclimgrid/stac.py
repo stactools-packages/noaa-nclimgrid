@@ -109,6 +109,8 @@ def create_collection(frequency: str) -> Collection:
     else:
         collection = Collection(**constants.DAILY_COLLECTION)
 
+    collection.providers = constants.PROVIDERS
+
     item_assets = {}
     for var in VARS:
         item_assets[var] = AssetDefinition(asset_dict(frequency, var))
@@ -117,6 +119,6 @@ def create_collection(frequency: str) -> Collection:
 
     collection.stac_extensions.append(constants.RASTER_EXTENSION_V11)
 
-    collection.add_link(constants.LICENSE_LINK)
+    collection.add_links([constants.LICENSE_LINK, constants.LANDING_PAGE_LINK])
 
     return collection

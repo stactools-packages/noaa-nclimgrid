@@ -20,7 +20,13 @@
       "rel": "license",
       "href": "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332#Constraints",
       "type": "text/html",
-      "title": "NClimGrid Use and Access Constraints"
+      "title": "NClimGrid Data Use and Access Constraints"
+    },
+    {
+      "rel": "about",
+      "href": "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332",
+      "type": "text/html",
+      "title": "Product Landing Page"
     },
     {
       "rel": "item",
@@ -138,5 +144,15 @@
     "Surface Observations",
     "Climatology",
     "CONUS"
+  ],
+  "providers": [
+    {
+      "name": "NOAA National Centers for Environmental Information",
+      "roles": [
+        "producer",
+        "licensor"
+      ],
+      "url": "https://www.ncei.noaa.gov/"
+    }
   ]
 }

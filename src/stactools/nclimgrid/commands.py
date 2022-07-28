@@ -61,9 +61,7 @@ def create_nclimgrid_command(cli: Group) -> Command:
 
             collection.add_items(items)
             collection.update_extent_from_items()
-            move_all_assets(
-                collection,
-            )
+            move_all_assets(collection, ignore_conflicts=True)
 
         collection.validate_all()
         collection.save()

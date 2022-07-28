@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict
 
-from pystac import Extent, Link, SpatialExtent, TemporalExtent
+from pystac import Extent, Link, Provider, ProviderRole, SpatialExtent, TemporalExtent
 
 
 class Frequency(str, Enum):
@@ -61,9 +61,24 @@ LICENSE_LINK = Link(
         "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/"
         "iso?id=gov.noaa.ncdc:C00332#Constraints"
     ),
-    title="NClimGrid Use and Access Constraints",
+    title="NClimGrid Data Use and Access Constraints",
     media_type="text/html",
 )
+LANDING_PAGE_LINK = Link(
+    rel="about",
+    media_type="text/html",
+    title="Product Landing Page",
+    target="https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332",
+)
+
+PROVIDERS = [
+    Provider(
+        name="NOAA National Centers for Environmental Information",
+        roles=[ProviderRole.PRODUCER, ProviderRole.LICENSOR],
+        url="https://www.ncei.noaa.gov/",
+    )
+]
+
 
 MONTHLY_COLLECTION: Dict[str, Any] = {
     "id": "nclimgrid-monthly",
