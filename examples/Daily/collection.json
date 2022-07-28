@@ -1,0 +1,122 @@
+{
+  "type": "Collection",
+  "id": "nclimgrid-daily",
+  "stac_version": "1.0.0",
+  "description": "The NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d) consists of four climate variables derived from the Global Historical Climatology Network Daily dataset (GHCN-D): maximum temperature, minimum temperature, average temperature, and precipitation. Daily values in a 1/24 degree lat/lon (nominal 5x5 kilometer) grid are provided for the Continental United States. Daily data is available from 1951 to the present.",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./collection.json",
+      "type": "application/json",
+      "title": "NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d)"
+    },
+    {
+      "rel": "license",
+      "href": "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332#Constraints",
+      "type": "text/html",
+      "title": "NClimGrid Use and Access Constraints"
+    },
+    {
+      "rel": "item",
+      "href": "./202201-grd-prelim-01/202201-grd-prelim-01.json",
+      "type": "application/json"
+    }
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "item_assets": {
+    "prcp": {
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ],
+      "title": "Daily Precipitation (mm)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "mm",
+          "spatial_resolution": 5000
+        }
+      ]
+    },
+    "tavg": {
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ],
+      "title": "Daily Average Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ]
+    },
+    "tmax": {
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ],
+      "title": "Daily Maximmum Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ]
+    },
+    "tmin": {
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ],
+      "title": "Daily Minimum Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ]
+    }
+  },
+  "title": "NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d)",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -124.708333,
+          24.541666,
+          -66.999995,
+          49.375001
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2022-01-01T00:00:00Z",
+          "2022-01-01T23:59:59Z"
+        ]
+      ]
+    }
+  },
+  "license": "proprietary",
+  "keywords": [
+    "NOAA",
+    "NClimGrid",
+    "Air Temperature",
+    "Precipitation",
+    "Surface Observations",
+    "Climatology",
+    "CONUS"
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "type": "Feature",
   "stac_version": "1.0.0",
-  "id": "nclimgrid-189502",
+  "id": "nclimgrid-189501",
   "properties": {
     "proj:epsg": 4326,
     "proj:transform": [
@@ -16,9 +16,9 @@
       596,
       1385
     ],
-    "start_datetime": "1895-02-01T00:00:00Z",
-    "end_datetime": "1895-02-28T23:59:59Z",
-    "created": "2022-07-27T16:13:23.479005Z",
+    "start_datetime": "1895-01-01T00:00:00Z",
+    "end_datetime": "1895-01-31T23:59:59Z",
+    "created": "2022-07-28T12:47:32.831928Z",
     "datetime": null
   },
   "geometry": {
@@ -48,12 +48,31 @@
       ]
     ]
   },
-  "links": [],
+  "links": [
+    {
+      "rel": "root",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)"
+    }
+  ],
   "assets": {
     "prcp": {
-      "href": "../cogs/nclimgrid-prcp-189502.tif",
-      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "href": "./nclimgrid-prcp-189501.tif",
       "title": "Monthly Precipitation (mm)",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -67,9 +86,9 @@
       ]
     },
     "tavg": {
-      "href": "../cogs/nclimgrid-tavg-189502.tif",
-      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "href": "./nclimgrid-tavg-189501.tif",
       "title": "Monthly Average Temperature (degree Celsius)",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -83,9 +102,9 @@
       ]
     },
     "tmax": {
-      "href": "../cogs/nclimgrid-tmax-189502.tif",
-      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "href": "./nclimgrid-tmax-189501.tif",
       "title": "Monthly Maximmum Temperature (degree Celsius)",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -99,9 +118,9 @@
       ]
     },
     "tmin": {
-      "href": "../cogs/nclimgrid-tmin-189502.tif",
-      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "href": "./nclimgrid-tmin-189501.tif",
       "title": "Monthly Minimum Temperature (degree Celsius)",
+      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -124,5 +143,6 @@
   "stac_extensions": [
     "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
     "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
-  ]
+  ],
+  "collection": "nclimgrid-monthly"
 }

@@ -1,10 +1,14 @@
 import logging
 import os
+from tempfile import TemporaryDirectory
 
 import click
 from click import Command, Group
+from pystac import CatalogType
+from stactools.core.copy import move_all_assets
 
 from stactools.nclimgrid import stac
+from stactools.nclimgrid.utils import data_frequency
 
 logger = logging.getLogger(__name__)
 
@@ -19,32 +23,58 @@ def create_nclimgrid_command(cli: Group) -> Command:
     def nclimgrid() -> None:
         pass
 
-    # @nclimgrid.command(
-    #     "create-collection",
-    #     short_help="Creates a STAC collection",
-    # )
-    # @click.argument("destination")
-    # def create_collection_command(destination: str) -> None:
-    #     """Creates a STAC Collection
+    @nclimgrid.command(
+        "create-collection",
+        short_help="Creates a STAC collection",
+    )
+    @click.argument("INFILE")
+    @click.argument("OUTDIR")
+    def create_collection_command(infile: str, outdir: str) -> None:
+        """Creates a STAC Collection with Items generated from the HREFs listed
+        in INFILE. COGs are also generated and stored alongside the Items.
 
-    #     Args:
-    #         destination (str): An HREF for the Collection JSON
-    #     """
-    #     collection = stac.create_collection()
+        The INFILE should contain only Daily or only monthly HREFs. Only a
+        single HREF to a single variable (prcp, tavg, tmax, or tmin) should be
+        listed in the INFILE for each group of netCDF files.
 
-    #     collection.set_self_href(destination)
+        \b
+        Args:
+            infile (str): Text file containing one HREF to a netCDF file per
+                line.
+            outdir (str): Directory that will contain the collection.
+        """
+        with open(infile) as f:
+            hrefs = [os.path.abspath(line.strip()) for line in f.readlines()]
 
-    #     collection.save_object()
+        items = []
+        frequency = data_frequency(hrefs[0])
+        with TemporaryDirectory() as cog_dir:
+            for href in hrefs:
+                temp_items = stac.create_items(href, cog_dir)
+                items.extend(temp_items)
 
-    #     return None
+            collection = stac.create_collection(frequency)
+            collection.catalog_type = CatalogType.SELF_CONTAINED
+            collection.set_self_href(
+                os.path.join(outdir, f"{frequency}/collection.json")
+            )
+
+            collection.add_items(items)
+            collection.update_extent_from_items()
+            move_all_assets(collection)
+
+        collection.validate_all()
+        collection.save()
+
+        return None
 
     @nclimgrid.command("create-items", short_help="Creates STAC Items")
     @click.argument("INFILE")
     @click.argument("COGDIR")
     @click.argument("ITEMDIR")
-    def create_item_command(infile: str, cogdir: str, itemdir: str) -> None:
+    def create_items_command(infile: str, cogdir: str, itemdir: str) -> None:
         """Creates COGs and STAC Items for each day or month in the daily or
-        monthly netCDF infile.
+        monthly netCDF INFILE.
 
         \b
         Args:
