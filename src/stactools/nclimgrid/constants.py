@@ -79,6 +79,19 @@ PROVIDERS = [
     )
 ]
 
+EXTENT = Extent(
+    SpatialExtent([[-124.708333, 24.541666, -66.999995, 49.375001]]),
+    TemporalExtent([[datetime(1895, 1, 1, tzinfo=timezone.utc), None]]),
+)
+KEYWORDS = [
+    "NOAA",
+    "NClimGrid",
+    "Air Temperature",
+    "Precipitation",
+    "Surface Observations",
+    "Climatology",
+    "CONUS",
+]
 
 MONTHLY_COLLECTION: Dict[str, Any] = {
     "id": "nclimgrid-monthly",
@@ -92,19 +105,8 @@ MONTHLY_COLLECTION: Dict[str, Any] = {
         "United States. Monthly data is available from 1895 to the present."
     ),
     "license": "proprietary",
-    "keywords": [
-        "NOAA",
-        "NClimGrid",
-        "Air Temperature",
-        "Precipitation",
-        "Surface Observations",
-        "Climatology",
-        "CONUS",
-    ],
-    "extent": Extent(
-        SpatialExtent([[-124.708333, 24.541666, -66.999995, 49.375001]]),
-        TemporalExtent([[datetime(1895, 1, 1, tzinfo=timezone.utc), None]]),
-    ),
+    "keywords": KEYWORDS,
+    "extent": EXTENT,
 }
 MONTHLY_DATA_DOI = "10.7289/V5SX6B56"
 MONTHLY_DATA_CITATION = (
@@ -145,17 +147,6 @@ DAILY_COLLECTION: Dict[str, Any] = {
         "United States. Daily data is available from 1951 to the present."
     ),
     "license": "proprietary",
-    "keywords": [
-        "NOAA",
-        "NClimGrid",
-        "Air Temperature",
-        "Precipitation",
-        "Surface Observations",
-        "Climatology",
-        "CONUS",
-    ],
-    "extent": Extent(
-        SpatialExtent([[-124.708333, 24.541666, -66.999995, 49.375001]]),
-        TemporalExtent([[datetime(1951, 1, 1, tzinfo=timezone.utc), None]]),
-    ),
+    "keywords": KEYWORDS,
+    "extent": EXTENT,
 }
