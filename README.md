@@ -5,13 +5,55 @@
 - Name: nclimgrid
 - Package: `stactools.nclimgrid`
 - PyPI: https://pypi.org/project/stactools-nclimgrid/
-- Owner: @githubusername
-- Dataset homepage: http://example.com
+- Owner: @pjhartzell
+- Dataset homepage: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332
 - STAC extensions used:
+  - [item-assets](https://github.com/stac-extensions/item-assets)
   - [proj](https://github.com/stac-extensions/projection/)
   - [raster](https://github.com/stac-extensions/raster)
+  - [scientific](https://github.com/stac-extensions/scientific)
 
-A stactools package for [NClimGrid](https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332) data. In development.
+A stactools package for [NClimGrid](https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332) monthly and daily data covering the Continental United States (CONUS). The data consists of four variables:
+- Precipitation (prcp) in millimeters
+- Average temperature (tavg) in degrees Celsius
+- Minimum temperature (tmin) in degrees Celsius
+- Maximum temperature (tmax) in degrees Celsius
+
+The source monthly data is aggregated into into four netCDF files, one for each variable, and dates back to 1895. Each netCDF file is updated in place when data for a new month is available. The source daily data is aggregated into monthly netCDF files, with one file for each of the four variables. The netCDF files for the current month are updated in place when a data for a new day is available.
+
+## STAC Examples
+
+- [Monthly Collection and Items](examples/monthly)
+- [Daily Collection and Items](examples/daily)
+
+## Installation
+
+```shell
+$ pip install stactools-nclimgrid
+```
+
+## Command-line Usage
+
+### Items
+
+When using the command-line interface, COGs and Items are created for all months (monthly data) or all days in a month (daily data). Although four netCDF files are required to create a single Item (each netCDF contains data for one of the four variables), only a single HREF to one of the four netCDF files is required to create Items. The remaining three netCDFs are assumed to exist in the same directory as the specified HREF.
+
+```shell
+$ stac nclimgrid create-items <href to one netCDF file> <cog output directory> <item output directory>
+```
+
+### Collections
+
+A monthly or daily collection and corresponding COGs and Items can be created by adding netCDF HREFs to a text file. The COGs will be stored alongside the Items.
+
+```shell
+$ stac nclimgrid create-collection <text file path> <output directory>
+```
+
+For example, the monthly Collection, Items, and COGs found in the `examples/monthly` directory can be created with:
+```shell
+$ stac nclimgrid create-collection examples/file-list-monthly.txt
+```
 
 ## Contributing
 
