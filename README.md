@@ -15,16 +15,20 @@
 
 A stactools package for [NClimGrid](https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332) monthly and daily data covering the Continental United States (CONUS). The data consists of four variables:
 - Precipitation (prcp) in millimeters
-- Average temperature (tavg) in degrees Celsius
-- Minimum temperature (tmin) in degrees Celsius
-- Maximum temperature (tmax) in degrees Celsius
+- Average temperature (tavg) in degree Celsius
+- Minimum temperature (tmin) in degree Celsius
+- Maximum temperature (tmax) in degree Celsius
 
 The source monthly data is aggregated into four netCDF files, one for each variable, and dates back to 1895. Each monthly netCDF file is updated in place when data for a new month is available. The source daily data is aggregated into monthly netCDF files, with one file for each of the four variables, and dates back to 1951. The netCDF files for the current month of daily data are updated in place when data for a new day is available.
 
 ## STAC Examples
 
-- [Monthly Collection and Items](examples/monthly)
-- [Daily Collection and Items](examples/daily)
+- Monthly
+  - [Collection and Item JSON and COGs](examples/monthly)
+  - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/nclimgrid/main/examples/monthly/collection.json)
+- Daily
+  - [Collection and Item JSON and COGs](examples/daily)
+  - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/nclimgrid/main/examples/daily/collection.json)
 
 ## Installation
 
