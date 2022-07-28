@@ -24,10 +24,10 @@ The source monthly data is aggregated into four netCDF files, one for each varia
 ## STAC Examples
 
 - Monthly
-  - [Example Collection and Item JSON](examples/monthly)
+  - [Example Collection and Items in JSON form](examples/monthly)
   - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/nclimgrid/main/examples/monthly/collection.json)
 - Daily
-  - [Example Collection and Item JSON](examples/daily)
+  - [Example Collection and Items in JSON form](examples/daily)
   - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/nclimgrid/main/examples/daily/collection.json)
 
 ## Installation
