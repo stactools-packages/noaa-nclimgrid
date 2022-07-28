@@ -112,8 +112,8 @@ MONTHLY_DATA_CITATION = (
     "Vose, Russell S., Applequist, Scott, Squires, Mike, Durre, Imke, Menne, "
     "Matthew J., Williams, Claude N. Jr., Fenimore, Chris, Gleason, Karin, and "
     "Arndt, Derek (2014): NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)"
-    ", Version 1. [indicate subset used]. NOAA National Centers for "
-    "Environmental Information. DOI:10.7289/V5SX6B56 [access date]."
+    ", Version 1. NOAA National Centers for Environmental Information. "
+    "DOI:10.7289/V5SX6B56."
 )
 MONTHLY_DATA_PUBLICATION = [
     {

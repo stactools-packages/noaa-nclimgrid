@@ -45,7 +45,7 @@
     "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
   ],
   "sci:doi": "10.7289/V5SX6B56",
-  "sci:citation": "Vose, Russell S., Applequist, Scott, Squires, Mike, Durre, Imke, Menne, Matthew J., Williams, Claude N. Jr., Fenimore, Chris, Gleason, Karin, and Arndt, Derek (2014): NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid), Version 1. [indicate subset used]. NOAA National Centers for Environmental Information. DOI:10.7289/V5SX6B56 [access date].",
+  "sci:citation": "Vose, Russell S., Applequist, Scott, Squires, Mike, Durre, Imke, Menne, Matthew J., Williams, Claude N. Jr., Fenimore, Chris, Gleason, Karin, and Arndt, Derek (2014): NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid), Version 1. NOAA National Centers for Environmental Information. DOI:10.7289/V5SX6B56.",
   "sci:publications": [
     {
       "doi": "10.1175/JAMC-D-13-0248.1",
