@@ -62,3 +62,22 @@ class CommandsTest(CliTestCase):
             for item_file in item_files:
                 item = pystac.read_file(item_file)
                 item.validate()
+
+    def test_create_monthly_collection(self) -> None:
+        with TemporaryDirectory() as tmp_dir:
+            file_list_path = f"{tmp_dir}/test_monthly.txt"
+            with open(file_list_path, "w") as f:
+                f.write("tests/data-files/netcdf/monthly/nclimgrid_prcp.nc")
+
+            cmd = f"nclimgrid create-collection {file_list_path} {tmp_dir}"
+            self.run_command(cmd)
+
+            item_paths = ["Monthly/nclimgrid-189501", "Monthly/nclimgrid-189502"]
+            for item_path in item_paths:
+                item_files = glob.glob(f"{tmp_dir}/{item_path}/*.json")
+                assert len(item_files) == 1
+                cog_files = glob.glob(f"{tmp_dir}/{item_path}/*.tif")
+                assert len(cog_files) == 4
+
+            collection = pystac.read_file(f"{tmp_dir}/Monthly/collection.json")
+            collection.validate()
