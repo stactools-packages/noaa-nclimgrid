@@ -10,6 +10,14 @@ from stactools.nclimgrid.constants import ASSET_TITLES, RASTER_BANDS, VARS, Freq
 
 
 def data_frequency(href: str) -> Frequency:
+    """Determine if data is 'monthly' or 'daily' from the passed HREF.
+
+    Args:
+        href (str): HREF to a NClimGrid netCDF or COG file.
+
+    Returns:
+        Frequency: Enum of 'monthly' or 'daily'.
+    """
     basename = os.path.splitext(os.path.basename(href))[0]
     frequency = (
         Frequency.MONTHLY if basename.startswith("nclimgrid") else Frequency.DAILY
@@ -18,7 +26,18 @@ def data_frequency(href: str) -> Frequency:
 
 
 def nc_href_dict(nc_href: str) -> Dict[str, str]:
+    """Creates a dictionary mapping variables to netCDF HREFs.
+
+    Variables refers to one of 'prcp', 'tavg', 'tmax', or 'tmin'.
+
+    Args:
+        nc_href (str): HREF to a netCDF containing data from a single variable.
+
+    Returns:
+        Dict[str, str]: A dictionary mapping variables to netCDF HREFs.
+    """
     frequency = data_frequency(nc_href)
+
     base, filename = os.path.split(nc_href)
 
     if frequency == Frequency.DAILY:
@@ -32,8 +51,25 @@ def nc_href_dict(nc_href: str) -> Dict[str, str]:
     return href_dict
 
 
-def day_indices(nc_href: str) -> List[int]:
-    with fsspec.open(nc_href) as fobj:
+def day_indices(nc_prcp_href: str) -> List[int]:
+    """Creates a list of days, in descending order, with valid precipitation
+    data in a daily 'prcp' netCDF file.
+
+    The passed HREF must contain precipitation data. Daily netCDF precipitation
+    files for the current month contain 'fill' data (negative values) for those
+    days that do not yet contain data. This method detects the fill data and
+    does not include those days in the returned list.
+
+    Args:
+        nc_prcp_href (str): HREF to daily netCDF precipitation file.
+
+    Returns:
+        List[int]: List of days that have valid data.
+    """
+    if "prcp" not in os.path.basename(nc_prcp_href):
+        raise ValueError(f"'prcp' not detected in HREF: {nc_prcp_href}")
+
+    with fsspec.open(nc_prcp_href) as fobj:
         with xarray.open_dataset(fobj) as dataset:
             min_prcp = dataset.prcp.min(dim=("lat", "lon"), skipna=True).values
             days = sum(min_prcp >= 0)
@@ -42,6 +78,17 @@ def day_indices(nc_href: str) -> List[int]:
 
 
 def month_indices(nc_href: str) -> List[Dict[str, Any]]:
+    """Creates a list of dictionaries, where each dictionary contains an index
+    into the monthly netCDF data timestack and a corresponding yyyymm string
+    indicating the year and month.
+
+    Args:
+        nc_href (str): HREF to a monthly netCDF file.
+
+    Returns:
+        List[Dict[str, Any]]: List of dictionaries with index and timeslice
+            information.
+    """
     with fsspec.open(nc_href) as fobj:
         with xarray.open_dataset(fobj) as ds:
             years = ds.time.dt.year.data.tolist()
@@ -56,7 +103,16 @@ def month_indices(nc_href: str) -> List[Dict[str, Any]]:
     return idx_month
 
 
-def asset_dict(frequency: str, var: str) -> Dict[str, Any]:
+def _asset_dict(frequency: str, var: str) -> Dict[str, Any]:
+    """Returns a COG asset, less the HREF, in dictionary form.
+
+    Args:
+        frequency (str): One of 'daily' or 'monthly'.
+        var (str): One of 'prcp', 'tavg', 'tmax', or 'tmin'.
+
+    Returns:
+        Dict[str, Any]: A partial dictionary of STAC Asset components.
+    """
     return {
         "media_type": MediaType.COG,
         "roles": ["data"],

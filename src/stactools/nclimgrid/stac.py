@@ -1,4 +1,3 @@
-import logging
 import os
 from calendar import monthrange
 from datetime import datetime, timezone
@@ -15,17 +14,26 @@ from stactools.nclimgrid import constants
 from stactools.nclimgrid.cog import create_cogs
 from stactools.nclimgrid.constants import VARS, Frequency
 from stactools.nclimgrid.utils import (
-    asset_dict,
+    _asset_dict,
     data_frequency,
     day_indices,
     month_indices,
     nc_href_dict,
 )
 
-logger = logging.getLogger(__name__)
-
 
 def create_item(cog_hrefs: Dict[str, str]) -> Item:
+    """Creates a STAC Item with COG assets for a single temporal unit.
+
+    A temporal unit is a day for daily data or a month for monthly data.
+
+    Args:
+        cog_hrefs (Dict[str, str]): A dictionary mapping variables (keys) to
+            COG HREFs (values).
+
+    Returns:
+        Item: A STAC Item.
+    """
     frequency = data_frequency(cog_hrefs["prcp"])
     basename = os.path.splitext(os.path.basename(cog_hrefs["prcp"]))[0]
 
@@ -55,7 +63,7 @@ def create_item(cog_hrefs: Dict[str, str]) -> Item:
 
     item.assets.pop("data")
     for var in VARS:
-        asset = asset_dict(frequency.value, var)
+        asset = _asset_dict(frequency.value, var)
         asset["href"] = make_absolute_href(cog_hrefs[var])
         item.add_asset(var, Asset.from_dict(asset))
 
@@ -67,9 +75,28 @@ def create_item(cog_hrefs: Dict[str, str]) -> Item:
 def create_items(
     nc_href: str,
     cog_dir: str,
-    existence_checker: Optional[Callable[[str], bool]] = None,
+    short_circuit: Optional[Callable[[str], bool]] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> List[Item]:
+    """Creates STAC Items for all temporal units in set of netCDF files.
+
+    A temporal unit is a day for daily data or a month for monthly data. A set
+    of netCDF files refers to 'prcp', 'tavg', 'tmin', and 'tmax' netCDF files
+    for a common timespan, where the common timespan is 1895 to present for
+    monthly data or a single month for daily data.
+
+    Args:
+        nc_href (str): HREF to a netCDF containing data for one of the four
+            variables (prcp, tavg, tmax, tmin).
+        cog_dir (str): Destination directory for COGs which will be created.
+        short_circuit (Optional[Callable[[str], bool]]): A placeholder
+            for an optional function that checks for existing Items and/or COGs.
+        read_href_modifier (Optional[ReadHrefModifier]): An optional function
+            to modify an href (e.g., to add a token to a url).
+
+    Returns:
+        List[Item]: A list of the created STAC Items.
+    """
     frequency = data_frequency(nc_href)
     nc_hrefs = nc_href_dict(nc_href)
 
@@ -82,14 +109,14 @@ def create_items(
     if frequency == Frequency.DAILY:
         days = day_indices(read_nc_hrefs["prcp"])
         for day in days:
-            # TODO: existence checker here
+            # TODO: short_circuit here
             cog_paths = create_cogs(read_nc_hrefs, cog_dir, day=day)
             items.append(create_item(cog_paths))
 
     else:
         months = month_indices(read_nc_hrefs["prcp"])
         for month in months:
-            # TODO: existence checker here
+            # TODO: short_circuit here
             cog_paths = create_cogs(read_nc_hrefs, cog_dir, month=month)
             items.append(create_item(cog_paths))
 
@@ -97,6 +124,14 @@ def create_items(
 
 
 def create_collection(frequency: str) -> Collection:
+    """Creates a STAC Collection for monthly or daily NClimGrid data.
+
+    Args:
+        frequency (str): One of 'monthly' or 'daily'.
+
+    Returns:
+        Collection: A STAC collection for monthly or daily NClimGrid data.
+    """
     if frequency == Frequency.MONTHLY:
         collection = Collection(**constants.MONTHLY_COLLECTION)
 
@@ -113,7 +148,7 @@ def create_collection(frequency: str) -> Collection:
 
     item_assets = {}
     for var in VARS:
-        item_assets[var] = AssetDefinition(asset_dict(frequency, var))
+        item_assets[var] = AssetDefinition(_asset_dict(frequency, var))
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
     item_assets_ext.item_assets = item_assets
 

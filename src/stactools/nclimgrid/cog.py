@@ -32,6 +32,17 @@ def cog_time_slice(
     cog_path: str,
     time_index: int,
 ) -> None:
+    """Create a COG from a single timeslice of a netCDF DataArray.
+
+    Args:
+        nc_href (str): HREF to the netCDF file.
+        var (str): One of 'prcp', 'tavg', 'tmax', or 'tmin'.
+        cog_path (str): Destination for created COG file.
+        time_index (int): index into the data timestack (netCDF DataArray).
+            For daily data, the index is the day of the month. For monthly data,
+            the index is the number of months since January 1895 where January
+            1895 is month=1.
+    """
     with fsspec.open(nc_href) as file_object:
         with xarray.open_dataset(file_object) as dataset:
             values = dataset[var].isel(time=time_index).values
@@ -52,6 +63,24 @@ def create_cogs(
     day: Optional[int] = None,
     month: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, str]:
+    """Creates a prcp, tavg, tmax, and tmin COGS for a single temporal unit.
+
+    A temporal unit is a day for daily data or a month for monthly data.
+
+    Args:
+        nc_hrefs (Dict[str, str]): A dictionary mapping variables (keys) to
+            netCDF HREFs (values).
+        cog_dir (str): Destination directory for created COGs.
+        day (Optional[int], optional): Day of month. Used to index into the
+            data timestacks. Only specify for daily data.
+        month (Optional[Dict[str, Any]], optional): Months since January 1895
+            where January 1895 is month=1. Used to index into the data
+            timestacks. Only specify for monthly data.
+
+    Returns:
+        Dict[str, str]: A dictionary mapping variables (keys) to COG HREFs
+            (values).
+    """
     cog_paths = {}
     if day:
         time_index = day - 1
