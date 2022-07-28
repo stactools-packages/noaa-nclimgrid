@@ -7,6 +7,7 @@ from click import Command, Group
 from stactools.testing.cli_test import CliTestCase
 
 from stactools.nclimgrid.commands import create_nclimgrid_command
+from tests import test_data
 
 
 class CommandsTest(CliTestCase):
@@ -14,7 +15,7 @@ class CommandsTest(CliTestCase):
         return [create_nclimgrid_command]
 
     def test_create_monthly_items(self) -> None:
-        nc_href = "tests/data-files/netcdf/monthly/nclimgrid_prcp.nc"
+        nc_href = test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc")
         with TemporaryDirectory() as tmp_dir:
             cmd = f"nclimgrid create-items {nc_href} {tmp_dir} {tmp_dir}"
             self.run_command(cmd)
@@ -29,7 +30,9 @@ class CommandsTest(CliTestCase):
                 item.validate()
 
     def test_create_daily_items(self) -> None:
-        nc_href = "tests/data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"  # noqa
+        nc_href = test_data.get_path(
+            "data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
+        )
         with TemporaryDirectory() as tmp_dir:
             cmd = f"nclimgrid create-items {nc_href} {tmp_dir} {tmp_dir}"
             self.run_command(cmd)
@@ -47,7 +50,9 @@ class CommandsTest(CliTestCase):
         with TemporaryDirectory() as tmp_dir:
             file_list_path = f"{tmp_dir}/test_monthly.txt"
             with open(file_list_path, "w") as f:
-                f.write("tests/data-files/netcdf/monthly/nclimgrid_prcp.nc")
+                f.write(
+                    test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc")
+                )
 
             cmd = f"nclimgrid create-collection {file_list_path} {tmp_dir}"
             self.run_command(cmd)
