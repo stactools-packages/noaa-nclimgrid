@@ -8,7 +8,7 @@ import rasterio.shutil
 import xarray
 from rasterio.io import MemoryFile
 
-from stactools.nclimgrid.constants import VARS
+from stactools.nclimgrid.constants import Variable
 
 TRANSFORM = [0.04166667, 0.0, -124.70833333, 0.0, -0.04166667, 49.37500127]
 
@@ -58,17 +58,17 @@ def cog_time_slice(
 
 
 def create_cogs(
-    nc_hrefs: Dict[str, str],
+    nc_hrefs: Dict[Variable, str],
     cog_dir: str,
     day: Optional[int] = None,
     month: Optional[Dict[str, Any]] = None,
-) -> Dict[str, str]:
+) -> Dict[Variable, str]:
     """Creates a prcp, tavg, tmax, and tmin COGS for a single temporal unit.
 
     A temporal unit is a day for daily data or a month for monthly data.
 
     Args:
-        nc_hrefs (Dict[str, str]): A dictionary mapping variables (keys) to
+        nc_hrefs (Dict[Variable, str]): A dictionary mapping variables (keys) to
             netCDF HREFs (values).
         cog_dir (str): Destination directory for created COGs.
         day (Optional[int], optional): Day of month. Used to index into the
@@ -78,25 +78,26 @@ def create_cogs(
             timestacks. Only specify for monthly data.
 
     Returns:
-        Dict[str, str]: A dictionary mapping variables (keys) to COG HREFs
+        Dict[Variable, str]: A dictionary mapping variables (keys) to COG HREFs
             (values).
     """
     cog_paths = {}
     if day:
         time_index = day - 1
         basenames = {
-            var: os.path.splitext(os.path.basename(nc_hrefs[var]))[0] for var in VARS
+            var: os.path.splitext(os.path.basename(nc_hrefs[var]))[0]
+            for var in Variable
         }
         cog_paths = {
             var: os.path.join(cog_dir, f"{basenames[var]}-{day:02d}.tif")
-            for var in VARS
+            for var in Variable
         }
     elif month:
         time_index = month["idx"] - 1
-        filenames = {var: f"nclimgrid-{var}-{month['date']}.tif" for var in VARS}
-        cog_paths = {var: os.path.join(cog_dir, filenames[var]) for var in VARS}
+        filenames = {var: f"nclimgrid-{var}-{month['date']}.tif" for var in Variable}
+        cog_paths = {var: os.path.join(cog_dir, filenames[var]) for var in Variable}
 
-    for var in VARS:
+    for var in Variable:
         cog_time_slice(nc_hrefs[var], var, cog_paths[var], time_index)
 
     return cog_paths

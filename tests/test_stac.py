@@ -2,6 +2,7 @@ from tempfile import TemporaryDirectory
 from typing import Any, Dict, Optional
 
 from stactools.nclimgrid import cog, stac
+from stactools.nclimgrid.constants import Frequency, Variable
 from tests import test_data
 
 
@@ -55,10 +56,18 @@ def test_create_daily_items_new_only() -> None:
 
 def test_create_single_item() -> None:
     cog_hrefs = {
-        "prcp": test_data.get_path("data-files/cog/monthly/nclimgrid-prcp-189501.tif"),
-        "tavg": test_data.get_path("data-files/cog/monthly/nclimgrid-tavg-189501.tif"),
-        "tmax": test_data.get_path("data-files/cog/monthly/nclimgrid-tmax-189501.tif"),
-        "tmin": test_data.get_path("data-files/cog/monthly/nclimgrid-tmin-189501.tif"),
+        Variable.PRCP: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-prcp-189501.tif"
+        ),
+        Variable.TAVG: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-tavg-189501.tif"
+        ),
+        Variable.TMAX: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-tmax-189501.tif"
+        ),
+        Variable.TMIN: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-tmin-189501.tif"
+        ),
     }
     item = stac.create_item(cog_hrefs)
     assert item.id == "nclimgrid-189501"
@@ -68,10 +77,18 @@ def test_create_single_item() -> None:
 
 def test_create_cogs() -> None:
     nc_hrefs = {
-        "prcp": test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc"),
-        "tavg": test_data.get_path("data-files/netcdf/monthly/nclimgrid_tavg.nc"),
-        "tmax": test_data.get_path("data-files/netcdf/monthly/nclimgrid_tmax.nc"),
-        "tmin": test_data.get_path("data-files/netcdf/monthly/nclimgrid_tmin.nc"),
+        Variable.PRCP: test_data.get_path(
+            "data-files/netcdf/monthly/nclimgrid_prcp.nc"
+        ),
+        Variable.TAVG: test_data.get_path(
+            "data-files/netcdf/monthly/nclimgrid_tavg.nc"
+        ),
+        Variable.TMAX: test_data.get_path(
+            "data-files/netcdf/monthly/nclimgrid_tmax.nc"
+        ),
+        Variable.TMIN: test_data.get_path(
+            "data-files/netcdf/monthly/nclimgrid_tmin.nc"
+        ),
     }
     with TemporaryDirectory() as cog_dir:
         month: Optional[Dict[str, Any]] = {"idx": 1, "date": "189502"}
@@ -95,7 +112,7 @@ def test_read_href_modifier() -> None:
 
 
 def test_daily_collection() -> None:
-    collection = stac.create_collection("daily")
+    collection = stac.create_collection(Frequency.DAILY)
     collection_dict = collection.to_dict()
     assert collection.id == "nclimgrid-daily"
     assert "sci:doi" not in collection_dict
@@ -105,7 +122,7 @@ def test_daily_collection() -> None:
 
 
 def test_monthly_collection() -> None:
-    collection = stac.create_collection("monthly")
+    collection = stac.create_collection(Frequency.MONTHLY)
     collection_dict = collection.to_dict()
     assert collection.id == "nclimgrid-monthly"
     assert "sci:doi" in collection_dict
