@@ -101,7 +101,7 @@ def create_items(
     nc_hrefs = nc_href_dict(nc_href)
 
     if read_href_modifier:
-        read_nc_hrefs = {var: read_href_modifier(nc_hrefs[var]) for var in VARS}
+        read_nc_hrefs = {var: read_href_modifier(nc_hrefs[var]) for var in nc_hrefs.keys()}
     else:
         read_nc_hrefs = nc_hrefs
 
