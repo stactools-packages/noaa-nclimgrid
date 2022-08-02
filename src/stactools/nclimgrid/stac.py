@@ -126,11 +126,11 @@ def create_items(
     return items
 
 
-def create_collection(frequency: str) -> Collection:
+def create_collection(frequency: Frequency) -> Collection:
     """Creates a STAC Collection for monthly or daily NClimGrid data.
 
     Args:
-        frequency (str): One of 'monthly' or 'daily'.
+        frequency (Frequency): One of 'monthly' or 'daily'.
 
     Returns:
         Collection: A STAC collection for monthly or daily NClimGrid data.
