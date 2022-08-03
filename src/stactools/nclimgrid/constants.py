@@ -10,17 +10,22 @@ class Frequency(str, Enum):
     MONTHLY = "monthly"
 
 
-VARS = ["prcp", "tavg", "tmax", "tmin"]
+class Variable(str, Enum):
+    PRCP = "prcp"
+    TAVG = "tavg"
+    TMAX = "tmax"
+    TMIN = "tmin"
+
 
 ASSET_TITLES = {
-    "prcp": "Precipitation (mm)",
-    "tavg": "Average Temperature (degree Celsius)",
-    "tmax": "Maximmum Temperature (degree Celsius)",
-    "tmin": "Minimum Temperature (degree Celsius)",
+    Variable.PRCP: "Precipitation (mm)",
+    Variable.TAVG: "Average Temperature (degree Celsius)",
+    Variable.TMAX: "Maximmum Temperature (degree Celsius)",
+    Variable.TMIN: "Minimum Temperature (degree Celsius)",
 }
 
 RASTER_BANDS = {
-    "prcp": [
+    Variable.PRCP: [
         {
             "data_type": "float32",
             "nodata": "nan",
@@ -28,7 +33,7 @@ RASTER_BANDS = {
             "spatial_resolution": 5000,
         }
     ],
-    "tavg": [
+    Variable.TAVG: [
         {
             "data_type": "float32",
             "nodata": "nan",
@@ -36,7 +41,7 @@ RASTER_BANDS = {
             "spatial_resolution": 5000,
         }
     ],
-    "tmax": [
+    Variable.TMAX: [
         {
             "data_type": "float32",
             "nodata": "nan",
@@ -44,7 +49,7 @@ RASTER_BANDS = {
             "spatial_resolution": 5000,
         }
     ],
-    "tmin": [
+    Variable.TMIN: [
         {
             "data_type": "float32",
             "nodata": "nan",

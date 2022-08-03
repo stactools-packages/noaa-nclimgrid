@@ -6,7 +6,12 @@ import fsspec
 import xarray
 from pystac import MediaType
 
-from stactools.nclimgrid.constants import ASSET_TITLES, RASTER_BANDS, VARS, Frequency
+from stactools.nclimgrid.constants import (
+    ASSET_TITLES,
+    RASTER_BANDS,
+    Frequency,
+    Variable,
+)
 
 
 def data_frequency(href: str) -> Frequency:
@@ -25,16 +30,16 @@ def data_frequency(href: str) -> Frequency:
     return frequency
 
 
-def nc_href_dict(nc_href: str) -> Dict[str, str]:
+def nc_href_dict(nc_href: str) -> Dict[Variable, str]:
     """Creates a dictionary mapping variables to netCDF HREFs.
 
-    Variables refers to one of 'prcp', 'tavg', 'tmax', or 'tmin'.
+    Variables refers to one of 'prcp', 'tavg', 'tmax', or 'tmin': :py:class:`Variable`.
 
     Args:
         nc_href (str): HREF to a netCDF containing data from a single variable.
 
     Returns:
-        Dict[str, str]: A dictionary mapping variables to netCDF HREFs.
+        Dict[Variable, str]: A dictionary mapping variables to netCDF HREFs.
     """
     frequency = data_frequency(nc_href)
 
@@ -42,9 +47,9 @@ def nc_href_dict(nc_href: str) -> Dict[str, str]:
 
     if frequency == Frequency.DAILY:
         suffix = filename[4:]
-        filenames = {var: f"{var}{suffix}" for var in VARS}
+        filenames = {var: f"{var}{suffix}" for var in Variable}
     else:
-        filenames = {var: f"nclimgrid_{var}{filename[14:]}" for var in VARS}
+        filenames = {var: f"nclimgrid_{var}{filename[14:]}" for var in Variable}
 
     href_dict = {var: os.path.join(base, f) for var, f in filenames.items()}
 
@@ -66,8 +71,8 @@ def day_indices(nc_prcp_href: str) -> List[int]:
     Returns:
         List[int]: List of days that have valid data.
     """
-    if "prcp" not in os.path.basename(nc_prcp_href):
-        raise ValueError(f"'prcp' not detected in HREF: {nc_prcp_href}")
+    if Variable.PRCP not in os.path.basename(nc_prcp_href):
+        raise ValueError(f"'{Variable.PRCP}' not detected in HREF: {nc_prcp_href}")
 
     with fsspec.open(nc_prcp_href) as fobj:
         with xarray.open_dataset(fobj) as dataset:
@@ -103,7 +108,7 @@ def month_indices(nc_href: str) -> List[Dict[str, Any]]:
     return idx_month
 
 
-def _asset_dict(frequency: str, var: str) -> Dict[str, Any]:
+def asset_dict(frequency: Frequency, var: Variable) -> Dict[str, Any]:
     """Returns a COG asset, less the HREF, in dictionary form.
 
     Args:
