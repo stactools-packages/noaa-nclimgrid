@@ -1,4 +1,4 @@
-from stactools.nclimgrid import utils
+from stactools.noaa_nclimgrid import utils
 from tests import test_data
 
 

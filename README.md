@@ -1,10 +1,10 @@
-# stactools-nclimgrid
+# stactools-noaa-nclimgrid
 
-[![PyPI](https://img.shields.io/pypi/v/stactools-nclimgrid)](https://pypi.org/project/stactools-nclimgrid/)
+[![PyPI](https://img.shields.io/pypi/v/stactools-noaa-nclimgrid)](https://pypi.org/project/stactools-noaa-nclimgrid/)
 
-- Name: nclimgrid
-- Package: `stactools.nclimgrid`
-- PyPI: https://pypi.org/project/stactools-nclimgrid/
+- Name: noaa-nclimgrid
+- Package: `stactools.noaa-nclimgrid`
+- PyPI: https://pypi.org/project/stactools-noaa-nclimgrid/
 - Owner: @pjhartzell
 - Dataset homepage: https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332
 - STAC extensions used:
@@ -13,7 +13,7 @@
   - [raster](https://github.com/stac-extensions/raster)
   - [scientific](https://github.com/stac-extensions/scientific)
 
-A stactools package for [NClimGrid](https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332) monthly and daily data covering the Continental United States (CONUS). The data consists of four variables:
+A stactools package for [NOAA NClimGrid](https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332) monthly and daily data covering the Continental United States (CONUS). The data consists of four variables:
 - Precipitation (prcp) in millimeters
 - Average temperature (tavg) in degree Celsius
 - Minimum temperature (tmin) in degree Celsius
@@ -25,15 +25,15 @@ The source monthly data is aggregated into four netCDF files, one for each varia
 
 - Monthly
   - [Example Collection and Items in JSON form](examples/monthly)
-  - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/nclimgrid/main/examples/monthly/collection.json)
+  - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/noaa-nclimgrid/main/examples/monthly/collection.json)
 - Daily
   - [Example Collection and Items in JSON form](examples/daily)
-  - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/nclimgrid/main/examples/daily/collection.json)
+  - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/noaa-nclimgrid/main/examples/daily/collection.json)
 
 ## Installation
 
 ```shell
-$ pip install stactools-nclimgrid
+$ pip install stactools-noaa-nclimgrid
 ```
 
 ## Command-line Usage
@@ -43,7 +43,7 @@ $ pip install stactools-nclimgrid
 When using the command-line interface, COGs and Items are created for all months (monthly data) or all days in a month (daily data). Although four netCDF files are required to create a single Item (each netCDF contains data for one of the four variables), only a single HREF to one of the four netCDF files is required to create Items. The remaining three netCDFs are assumed to exist in the same directory as the specified HREF.
 
 ```shell
-$ stac nclimgrid create-items <href to one netCDF file> <cog output directory> <item output directory>
+$ stac noaa-nclimgrid create-items <href to one netCDF file> <cog output directory> <item output directory>
 ```
 
 ### Collections
@@ -51,12 +51,12 @@ $ stac nclimgrid create-items <href to one netCDF file> <cog output directory> <
 A monthly or daily collection and corresponding COGs and Items can be created by adding netCDF HREFs to a text file. The COGs will be stored alongside the Items.
 
 ```shell
-$ stac nclimgrid create-collection <text file path> <output directory>
+$ stac noaa-nclimgrid create-collection <text file path> <output directory>
 ```
 
 For example, the monthly Collection, Items, and COGs found in the `examples/monthly` directory can be created with:
 ```shell
-$ stac nclimgrid create-collection examples/file-list-monthly.txt examples
+$ stac noaa-nclimgrid create-collection examples/file-list-monthly.txt examples
 ```
 
 ## Contributing

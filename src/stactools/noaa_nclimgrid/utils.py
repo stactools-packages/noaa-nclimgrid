@@ -6,7 +6,7 @@ import fsspec
 import xarray
 from pystac import MediaType
 
-from stactools.nclimgrid.constants import (
+from stactools.noaa_nclimgrid.constants import (
     ASSET_TITLES,
     RASTER_BANDS,
     Frequency,

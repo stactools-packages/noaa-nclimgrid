@@ -1,4 +1,4 @@
-name: stactools-nclimgrid
+name: stactools-noaa-nclimgrid
 channels:
   - conda-forge
   - defaults

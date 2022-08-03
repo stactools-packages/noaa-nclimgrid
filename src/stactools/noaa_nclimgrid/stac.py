@@ -10,10 +10,10 @@ from pystac.extensions.scientific import ScientificExtension
 from pystac.utils import make_absolute_href
 from stactools.core.io import ReadHrefModifier
 
-from stactools.nclimgrid import constants
-from stactools.nclimgrid.cog import create_cogs
-from stactools.nclimgrid.constants import Frequency, Variable
-from stactools.nclimgrid.utils import (
+from stactools.noaa_nclimgrid import constants
+from stactools.noaa_nclimgrid.cog import create_cogs
+from stactools.noaa_nclimgrid.constants import Frequency, Variable
+from stactools.noaa_nclimgrid.utils import (
     asset_dict,
     data_frequency,
     day_indices,
