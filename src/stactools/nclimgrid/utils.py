@@ -108,7 +108,7 @@ def month_indices(nc_href: str) -> List[Dict[str, Any]]:
     return idx_month
 
 
-def asset_dict(frequency: str, var: Variable) -> Dict[str, Any]:
+def asset_dict(frequency: Frequency, var: Variable) -> Dict[str, Any]:
     """Returns a COG asset, less the HREF, in dictionary form.
 
     Args:

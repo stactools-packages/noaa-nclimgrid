@@ -63,7 +63,7 @@ def create_item(cog_hrefs: Dict[Variable, str]) -> Item:
 
     item.assets.pop("data")
     for var in Variable:
-        asset = asset_dict(frequency.value, var)
+        asset = asset_dict(frequency, var)
         asset["href"] = make_absolute_href(cog_hrefs[var])
         item.add_asset(var, Asset.from_dict(asset))
 
