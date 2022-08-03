@@ -8,7 +8,7 @@ import rasterio.shutil
 import xarray
 from rasterio.io import MemoryFile
 
-from stactools.nclimgrid.constants import Variable
+from stactools.noaa_nclimgrid.constants import Variable
 
 TRANSFORM = [0.04166667, 0.0, -124.70833333, 0.0, -0.04166667, 49.37500127]
 

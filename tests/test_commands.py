@@ -6,18 +6,18 @@ import pystac
 from click import Command, Group
 from stactools.testing.cli_test import CliTestCase
 
-from stactools.nclimgrid.commands import create_nclimgrid_command
+from stactools.noaa_nclimgrid.commands import create_noaa_nclimgrid_command
 from tests import test_data
 
 
 class CommandsTest(CliTestCase):
     def create_subcommand_functions(self) -> List[Callable[[Group], Command]]:
-        return [create_nclimgrid_command]
+        return [create_noaa_nclimgrid_command]
 
     def test_create_monthly_items(self) -> None:
         nc_href = test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc")
         with TemporaryDirectory() as tmp_dir:
-            cmd = f"nclimgrid create-items {nc_href} {tmp_dir} {tmp_dir}"
+            cmd = f"noaa-nclimgrid create-items {nc_href} {tmp_dir} {tmp_dir}"
             self.run_command(cmd)
 
             cog_files = glob.glob(f"{tmp_dir}/*tif")
@@ -34,7 +34,7 @@ class CommandsTest(CliTestCase):
             "data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
         )
         with TemporaryDirectory() as tmp_dir:
-            cmd = f"nclimgrid create-items {nc_href} {tmp_dir} {tmp_dir}"
+            cmd = f"noaa-nclimgrid create-items {nc_href} {tmp_dir} {tmp_dir}"
             self.run_command(cmd)
 
             cog_files = glob.glob(f"{tmp_dir}/*tif")
@@ -54,7 +54,7 @@ class CommandsTest(CliTestCase):
                     test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc")
                 )
 
-            cmd = f"nclimgrid create-collection {file_list_path} {tmp_dir}"
+            cmd = f"noaa-nclimgrid create-collection {file_list_path} {tmp_dir}"
             self.run_command(cmd)
 
             item_paths = ["monthly/nclimgrid-189501", "monthly/nclimgrid-189502"]

@@ -1,8 +1,8 @@
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Optional
 
-from stactools.nclimgrid import cog, stac
-from stactools.nclimgrid.constants import Frequency, Variable
+from stactools.noaa_nclimgrid import cog, stac
+from stactools.noaa_nclimgrid.constants import Frequency, Variable
 from tests import test_data
 
 

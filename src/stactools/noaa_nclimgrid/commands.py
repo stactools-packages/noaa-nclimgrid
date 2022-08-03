@@ -7,23 +7,23 @@ from click import Command, Group
 from pystac import CatalogType
 from stactools.core.copy import move_all_assets
 
-from stactools.nclimgrid import stac
-from stactools.nclimgrid.utils import data_frequency
+from stactools.noaa_nclimgrid import stac
+from stactools.noaa_nclimgrid.utils import data_frequency
 
 logger = logging.getLogger(__name__)
 
 
-def create_nclimgrid_command(cli: Group) -> Command:
-    """Creates the stactools-nclimgrid command line utility."""
+def create_noaa_nclimgrid_command(cli: Group) -> Command:
+    """Creates the stactools-noaa-nclimgrid command line utility."""
 
     @cli.group(
-        "nclimgrid",
-        short_help=("Commands for working with stactools-nclimgrid"),
+        "noaa-nclimgrid",
+        short_help=("Commands for working with stactools-noaa-nclimgrid"),
     )
-    def nclimgrid() -> None:
+    def noaa_nclimgrid() -> None:
         pass
 
-    @nclimgrid.command(
+    @noaa_nclimgrid.command(
         "create-collection",
         short_help="Creates a STAC collection",
     )
@@ -68,7 +68,7 @@ def create_nclimgrid_command(cli: Group) -> Command:
 
         return None
 
-    @nclimgrid.command("create-items", short_help="Creates STAC Items")
+    @noaa_nclimgrid.command("create-items", short_help="Creates STAC Items")
     @click.argument("INFILE")
     @click.argument("COGDIR")
     @click.argument("ITEMDIR")
@@ -94,4 +94,4 @@ def create_nclimgrid_command(cli: Group) -> Command:
 
         return None
 
-    return nclimgrid
+    return noaa_nclimgrid
