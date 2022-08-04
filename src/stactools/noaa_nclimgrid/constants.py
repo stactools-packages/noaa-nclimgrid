@@ -17,14 +17,14 @@ class Variable(str, Enum):
     TMIN = "tmin"
 
 
-ASSET_TITLES = {
+COG_ASSET_TITLES = {
     Variable.PRCP: "Precipitation (mm)",
     Variable.TAVG: "Average Temperature (degree Celsius)",
     Variable.TMAX: "Maximmum Temperature (degree Celsius)",
     Variable.TMIN: "Minimum Temperature (degree Celsius)",
 }
-
-RASTER_BANDS = {
+COG_ROLES = ["data"]
+COG_RASTER_BANDS = {
     Variable.PRCP: [
         {
             "data_type": "float32",
@@ -59,6 +59,16 @@ RASTER_BANDS = {
     ],
 }
 RASTER_EXTENSION_V11 = "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+
+NETCDF_MEDIA_TYPE = "application/netcdf"
+NETCDF_ASSET_TITLES = {
+    Variable.PRCP: "Precipitation Source Data",
+    Variable.TAVG: "Average Temperature Source Data",
+    Variable.TMAX: "Maximmum Temperature Source Data",
+    Variable.TMIN: "Minimum Temperature Source Data",
+}
+NETCDF_ROLES = ["data", "source"]
+
 
 LICENSE_LINK = Link(
     rel="license",

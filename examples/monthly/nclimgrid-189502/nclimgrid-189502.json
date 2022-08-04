@@ -132,6 +132,46 @@
       "roles": [
         "data"
       ]
+    },
+    "prcp_source": {
+      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_prcp.nc",
+      "title": "Monthly Precipitation Source Data",
+      "media_type": "application/netcdf",
+      "creation": "2021-01-12T11:12:04.092799Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    },
+    "tavg_source": {
+      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_tavg.nc",
+      "title": "Monthly Average Temperature Source Data",
+      "media_type": "application/netcdf",
+      "creation": "2021-01-12T11:43:15.039779Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    },
+    "tmax_source": {
+      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_tmax.nc",
+      "title": "Monthly Maximmum Temperature Source Data",
+      "media_type": "application/netcdf",
+      "creation": "2022-01-10T09:30:51.836115Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    },
+    "tmin_source": {
+      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_tmin.nc",
+      "title": "Monthly Minimum Temperature Source Data",
+      "media_type": "application/netcdf",
+      "creation": "2022-01-10T09:19:27.861550Z",
+      "roles": [
+        "data",
+        "source"
+      ]
     }
   },
   "bbox": [
