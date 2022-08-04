@@ -4,14 +4,12 @@ from typing import Any, Dict, List
 
 import fsspec
 import xarray
+from dateutil import parser
 from pystac import MediaType
+from pystac.utils import datetime_to_str
 
-from stactools.noaa_nclimgrid.constants import (
-    ASSET_TITLES,
-    RASTER_BANDS,
-    Frequency,
-    Variable,
-)
+from stactools.noaa_nclimgrid import constants
+from stactools.noaa_nclimgrid.constants import Frequency, Variable
 
 
 def data_frequency(href: str) -> Frequency:
@@ -108,19 +106,55 @@ def month_indices(nc_href: str) -> List[Dict[str, Any]]:
     return idx_month
 
 
-def asset_dict(frequency: Frequency, var: Variable) -> Dict[str, Any]:
+def cog_asset_dict(frequency: Frequency, var: Variable) -> Dict[str, Any]:
     """Returns a COG asset, less the HREF, in dictionary form.
 
     Args:
-        frequency (str): One of 'daily' or 'monthly'.
-        var (str): One of 'prcp', 'tavg', 'tmax', or 'tmin'.
+        var (Variable):  One of 'prcp', 'tavg', 'tmax', or 'tmin'.
 
     Returns:
         Dict[str, Any]: A partial dictionary of STAC Asset components.
     """
     return {
         "media_type": MediaType.COG,
-        "roles": ["data"],
-        "title": f"{frequency.capitalize()} {ASSET_TITLES[var]}",
-        "raster:bands": RASTER_BANDS[var],
+        "roles": constants.COG_ROLES,
+        "title": f"{frequency.capitalize()} {constants.COG_ASSET_TITLES[var]}",
+        "raster:bands": constants.COG_RASTER_BANDS[var],
     }
+
+
+def nc_asset_dict(frequency: Frequency, var: Variable) -> Dict[str, Any]:
+    """Returns a netCDF asset, less the HREF, in dictionary form.
+
+    Args:
+        var (Variable):  One of 'prcp', 'tavg', 'tmax', or 'tmin'.
+
+    Returns:
+        Dict[str, Any]: A partial dictionary of STAC Asset components.
+    """
+    return {
+        "media_type": constants.NETCDF_MEDIA_TYPE,
+        "roles": constants.NETCDF_ROLES,
+        "title": f"{frequency.capitalize()} {constants.NETCDF_ASSET_TITLES[var]}",
+    }
+
+
+def nc_creation_date_dict(nc_hrefs: Dict[Variable, str]) -> Dict[Variable, str]:
+    """Returns a dictionary mapping variables to netCDF file creation dates.
+
+    Args:
+        nc_hrefs (Dict[Variable, str]): A dictionary mapping variables to netCDF
+            HREFS.
+
+    Returns:
+        Dict[Variable, str]: A dictionary mapping variables to netCDF file
+            creation times.
+    """
+    nc_creation_dates: Dict[Variable, str] = {}
+    for var in Variable:
+        with fsspec.open(nc_hrefs[var]) as fobj:
+            with xarray.open_dataset(fobj) as ds:
+                nc_creation_dates[var] = datetime_to_str(
+                    parser.parse(ds.attrs["date_created"])
+                )
+    return nc_creation_dates

@@ -24,6 +24,16 @@ def test_create_monthly_items_remote() -> None:
             item.validate()
 
 
+def test_create_monthly_items_with_netcdf_assets() -> None:
+    nc_href = test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc")
+    with TemporaryDirectory() as cog_dir:
+        items = stac.create_items(nc_href, cog_dir, nc_assets=True)
+        assert len(items) == 2
+        for item in items:
+            assert len(item.assets) == 8
+            item.validate()
+
+
 def test_create_daily_items_local() -> None:
     nc_href = test_data.get_path(
         "data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
@@ -44,14 +54,16 @@ def test_create_daily_items_remote() -> None:
             item.validate()
 
 
-def test_create_monthly_items_new_only() -> None:
-    # placeholder for testing a potential, optional callable to short-circuit
-    # item creation once existing items/cogs are detected (by the callable)
-    pass
-
-
-def test_create_daily_items_new_only() -> None:
-    pass
+def test_create_daily_items_with_netcdf_assets() -> None:
+    nc_href = test_data.get_path(
+        "data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
+    )
+    with TemporaryDirectory() as cog_dir:
+        items = stac.create_items(nc_href, cog_dir, nc_assets=True)
+        assert len(items) == 1
+        for item in items:
+            assert len(item.assets) == 8
+            item.validate()
 
 
 def test_create_single_item() -> None:
@@ -112,13 +124,14 @@ def test_read_href_modifier() -> None:
 
 
 def test_daily_collection() -> None:
-    collection = stac.create_collection(Frequency.DAILY)
+    collection = stac.create_collection(Frequency.DAILY, nc_assets=True)
     collection_dict = collection.to_dict()
     assert collection.id == "noaa-nclimgrid-daily"
     assert "sci:doi" not in collection_dict
     assert "sci:citation" not in collection_dict
     assert "sci:publications" not in collection_dict
     assert collection_dict["item_assets"]["prcp"]["title"].startswith("Daily")
+    assert len(collection_dict["item_assets"]) == 8
 
 
 def test_monthly_collection() -> None:
@@ -129,3 +142,4 @@ def test_monthly_collection() -> None:
     assert "sci:citation" in collection_dict
     assert "sci:publications" in collection_dict
     assert collection_dict["item_assets"]["prcp"]["title"].startswith("Monthly")
+    assert len(collection_dict["item_assets"]) == 4

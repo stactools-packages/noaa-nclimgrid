@@ -14,15 +14,21 @@ from stactools.noaa_nclimgrid import constants
 from stactools.noaa_nclimgrid.cog import create_cogs
 from stactools.noaa_nclimgrid.constants import Frequency, Variable
 from stactools.noaa_nclimgrid.utils import (
-    asset_dict,
+    cog_asset_dict,
     data_frequency,
     day_indices,
     month_indices,
+    nc_asset_dict,
+    nc_creation_date_dict,
     nc_href_dict,
 )
 
 
-def create_item(cog_hrefs: Dict[Variable, str]) -> Item:
+def create_item(
+    cog_hrefs: Dict[Variable, str],
+    nc_hrefs: Optional[Dict[Variable, str]] = None,
+    nc_creation_dates: Optional[Dict[Variable, str]] = None,
+) -> Item:
     """Creates a STAC Item with COG assets for a single temporal unit.
 
     A temporal unit is a day for daily data or a month for monthly data.
@@ -30,6 +36,11 @@ def create_item(cog_hrefs: Dict[Variable, str]) -> Item:
     Args:
         cog_hrefs (Dict[Variable, str]): A dictionary mapping variables (keys) to
             COG HREFs (values).
+        nc_hrefs (Optional[Dict[Variable, str]]): An optional dictionary mapping
+            variables (keys) to netCDF HREFs (values). If present, assets for
+            the source netCDF files will be included in the created Item.
+        nc_creation_dates (Optional[Dict[Variable, datetime]): An optional
+            dictionary mapping variables to netCDF file creation dates.
 
     Returns:
         Item: A STAC Item.
@@ -63,9 +74,16 @@ def create_item(cog_hrefs: Dict[Variable, str]) -> Item:
 
     item.assets.pop("data")
     for var in Variable:
-        asset = asset_dict(frequency, var)
+        asset = cog_asset_dict(frequency, var)
         asset["href"] = make_absolute_href(cog_hrefs[var])
         item.add_asset(var, Asset.from_dict(asset))
+    if nc_hrefs:
+        for var in Variable:
+            asset = nc_asset_dict(frequency, var)
+            asset["href"] = make_absolute_href(nc_hrefs[var])
+            if nc_creation_dates:
+                asset["creation"] = nc_creation_dates[var]
+            item.add_asset(f"{var}_source", Asset.from_dict(asset))
 
     item.stac_extensions.append(constants.RASTER_EXTENSION_V11)
 
@@ -75,6 +93,7 @@ def create_item(cog_hrefs: Dict[Variable, str]) -> Item:
 def create_items(
     nc_href: str,
     cog_dir: str,
+    nc_assets: bool = False,
     short_circuit: Optional[Callable[[str], bool]] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> List[Item]:
@@ -90,6 +109,8 @@ def create_items(
         nc_href (str): HREF to a netCDF containing data for one of the four
             variables (prcp, tavg, tmax, tmin).
         cog_dir (str): Destination directory for COGs which will be created.
+        nc_assets (bool): Flag to include Item assets for the source netCDF
+            files. Default is False.
         short_circuit (Optional[Callable[[str], bool]]): A placeholder
             for an optional function that checks for existing Items and/or COGs.
         read_href_modifier (Optional[ReadHrefModifier]): An optional function
@@ -108,29 +129,40 @@ def create_items(
     else:
         read_nc_hrefs = nc_hrefs
 
+    if nc_assets:
+        nc_creation_dates = nc_creation_date_dict(read_nc_hrefs)
+
     items: List[Item] = []
     if frequency == Frequency.DAILY:
         days = day_indices(read_nc_hrefs[Variable.PRCP])
         for day in days:
             # TODO: short_circuit here
             cog_paths = create_cogs(read_nc_hrefs, cog_dir, day=day)
-            items.append(create_item(cog_paths))
+            if nc_assets:
+                items.append(create_item(cog_paths, nc_hrefs, nc_creation_dates))
+            else:
+                items.append(create_item(cog_paths))
 
     else:
         months = month_indices(read_nc_hrefs[Variable.PRCP])
         for month in months:
             # TODO: short_circuit here
             cog_paths = create_cogs(read_nc_hrefs, cog_dir, month=month)
-            items.append(create_item(cog_paths))
+            if nc_assets:
+                items.append(create_item(cog_paths, nc_hrefs, nc_creation_dates))
+            else:
+                items.append(create_item(cog_paths))
 
     return items
 
 
-def create_collection(frequency: Frequency) -> Collection:
+def create_collection(frequency: Frequency, nc_assets: bool = False) -> Collection:
     """Creates a STAC Collection for monthly or daily NClimGrid data.
 
     Args:
         frequency (Frequency): One of 'monthly' or 'daily'.
+        nc_assets (bool): Flag to include Item assets for the source netCDF
+            files. Default is False.
 
     Returns:
         Collection: A STAC collection for monthly or daily NClimGrid data.
@@ -152,7 +184,12 @@ def create_collection(frequency: Frequency) -> Collection:
 
     item_assets = {}
     for var in Variable:
-        item_assets[var.value] = AssetDefinition(asset_dict(frequency, var))
+        item_assets[var.value] = AssetDefinition(cog_asset_dict(frequency, var))
+    if nc_assets:
+        for var in Variable:
+            item_assets[f"{var}_source"] = AssetDefinition(
+                nc_asset_dict(frequency, var)
+            )
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)
     item_assets_ext.item_assets = item_assets
 
