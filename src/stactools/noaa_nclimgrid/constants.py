@@ -157,3 +157,9 @@ DAILY_COLLECTION: Dict[str, Any] = {
         TemporalExtent([[datetime(1951, 1, 1, tzinfo=timezone.utc), None]]),
     ),
 }
+DAILY_DESCRIBEDBY_LINK = Link(
+    rel="describedby",
+    target="https://www1.ncdc.noaa.gov/pub/data/daily-grids/docs/nclimdiv-description.pdf",
+    title="NOAA Daily NClimGrid Product Description",
+    media_type="application/pdf",
+)

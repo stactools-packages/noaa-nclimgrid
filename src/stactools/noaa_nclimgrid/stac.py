@@ -146,6 +146,7 @@ def create_collection(frequency: Frequency) -> Collection:
 
     else:
         collection = Collection(**constants.DAILY_COLLECTION)
+        collection.add_link(constants.DAILY_DESCRIBEDBY_LINK)
 
     collection.providers = constants.PROVIDERS
 
