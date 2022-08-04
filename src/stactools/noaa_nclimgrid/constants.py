@@ -95,7 +95,7 @@ KEYWORDS = [
 ]
 
 MONTHLY_COLLECTION: Dict[str, Any] = {
-    "id": "nclimgrid-monthly",
+    "id": "noaa-nclimgrid-monthly",
     "title": "NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)",
     "description": (
         "The NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid) consists of "
@@ -140,7 +140,7 @@ MONTHLY_DATA_LINK = Link(
 )
 
 DAILY_COLLECTION: Dict[str, Any] = {
-    "id": "nclimgrid-daily",
+    "id": "noaa-nclimgrid-daily",
     "title": "NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d)",
     "description": (
         "The NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d) consists of "
