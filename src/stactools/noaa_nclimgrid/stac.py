@@ -76,14 +76,14 @@ def create_item(
     for var in Variable:
         asset = cog_asset_dict(frequency, var)
         asset["href"] = make_absolute_href(cog_hrefs[var])
-        item.add_asset(var, Asset.from_dict(asset))
+        item.add_asset(var.value, Asset.from_dict(asset))
     if nc_hrefs:
         for var in Variable:
             asset = nc_asset_dict(frequency, var)
             asset["href"] = make_absolute_href(nc_hrefs[var])
             if nc_creation_dates:
                 asset["creation"] = nc_creation_dates[var]
-            item.add_asset(f"{var}_source", Asset.from_dict(asset))
+            item.add_asset(f"{var.value}_source", Asset.from_dict(asset))
 
     item.stac_extensions.append(constants.RASTER_EXTENSION_V11)
 
@@ -187,7 +187,7 @@ def create_collection(frequency: Frequency, nc_assets: bool = False) -> Collecti
         item_assets[var.value] = AssetDefinition(cog_asset_dict(frequency, var))
     if nc_assets:
         for var in Variable:
-            item_assets[f"{var}_source"] = AssetDefinition(
+            item_assets[f"{var.value}_source"] = AssetDefinition(
                 nc_asset_dict(frequency, var)
             )
     item_assets_ext = ItemAssetsExtension.ext(collection, add_if_missing=True)

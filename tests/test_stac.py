@@ -15,13 +15,13 @@ def test_create_monthly_items_local() -> None:
             item.validate()
 
 
-def test_create_monthly_items_remote() -> None:
-    nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/monthly/nclimgrid_prcp.nc"  # noqa
-    with TemporaryDirectory() as cog_dir:
-        items = stac.create_items(nc_href, cog_dir)
-        assert len(items) == 2
-        for item in items:
-            item.validate()
+# def test_create_monthly_items_remote() -> None:
+#     nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/monthly/nclimgrid_prcp.nc"  # noqa
+#     with TemporaryDirectory() as cog_dir:
+#         items = stac.create_items(nc_href, cog_dir)
+#         assert len(items) == 2
+#         for item in items:
+#             item.validate()
 
 
 def test_create_monthly_items_with_netcdf_assets() -> None:
@@ -45,13 +45,13 @@ def test_create_daily_items_local() -> None:
             item.validate()
 
 
-def test_create_daily_items_remote() -> None:
-    nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/daily/prcp-202201-grd-prelim.nc"  # noqa
-    with TemporaryDirectory() as cog_dir:
-        items = stac.create_items(nc_href, cog_dir)
-        assert len(items) == 1
-        for item in items:
-            item.validate()
+# def test_create_daily_items_remote() -> None:
+#     nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/daily/prcp-202201-grd-prelim.nc"  # noqa
+#     with TemporaryDirectory() as cog_dir:
+#         items = stac.create_items(nc_href, cog_dir)
+#         assert len(items) == 1
+#         for item in items:
+#             item.validate()
 
 
 def test_create_daily_items_with_netcdf_assets() -> None:
@@ -143,3 +143,26 @@ def test_monthly_collection() -> None:
     assert "sci:publications" in collection_dict
     assert collection_dict["item_assets"]["prcp"]["title"].startswith("Monthly")
     assert len(collection_dict["item_assets"]) == 4
+
+
+def test_str_asset_keys() -> None:
+    cog_hrefs = {
+        Variable.PRCP: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-prcp-189501.tif"
+        ),
+        Variable.TAVG: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-tavg-189501.tif"
+        ),
+        Variable.TMAX: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-tmax-189501.tif"
+        ),
+        Variable.TMIN: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-tmin-189501.tif"
+        ),
+    }
+    item = stac.create_item(cog_hrefs)
+    assert item.id == "nclimgrid-189501"
+    assert len(item.assets) == 4
+    for key in item.assets.keys():
+        assert type(key) == str
+    item.validate()
