@@ -143,3 +143,26 @@ def test_monthly_collection() -> None:
     assert "sci:publications" in collection_dict
     assert collection_dict["item_assets"]["prcp"]["title"].startswith("Monthly")
     assert len(collection_dict["item_assets"]) == 4
+
+
+def test_str_asset_keys() -> None:
+    cog_hrefs = {
+        Variable.PRCP: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-prcp-189501.tif"
+        ),
+        Variable.TAVG: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-tavg-189501.tif"
+        ),
+        Variable.TMAX: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-tmax-189501.tif"
+        ),
+        Variable.TMIN: test_data.get_path(
+            "data-files/cog/monthly/nclimgrid-tmin-189501.tif"
+        ),
+    }
+    item = stac.create_item(cog_hrefs)
+    assert item.id == "nclimgrid-189501"
+    assert len(item.assets) == 4
+    for key in item.assets.keys():
+        assert isinstance(key, str)
+    item.validate()
