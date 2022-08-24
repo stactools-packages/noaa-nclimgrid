@@ -116,7 +116,7 @@ def cog_asset_dict(frequency: Frequency, var: Variable) -> Dict[str, Any]:
         Dict[str, Any]: A partial dictionary of STAC Asset components.
     """
     return {
-        "media_type": MediaType.COG,
+        "type": MediaType.COG,
         "roles": constants.COG_ROLES,
         "title": f"{frequency.capitalize()} {constants.COG_ASSET_TITLES[var]}",
         "raster:bands": constants.COG_RASTER_BANDS[var],
@@ -133,7 +133,7 @@ def nc_asset_dict(frequency: Frequency, var: Variable) -> Dict[str, Any]:
         Dict[str, Any]: A partial dictionary of STAC Asset components.
     """
     return {
-        "media_type": constants.NETCDF_MEDIA_TYPE,
+        "type": constants.NETCDF_MEDIA_TYPE,
         "roles": constants.NETCDF_ROLES,
         "title": f"{frequency.capitalize()} {constants.NETCDF_ASSET_TITLES[var]}",
     }
