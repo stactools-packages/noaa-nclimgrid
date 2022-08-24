@@ -18,7 +18,7 @@
     ],
     "start_datetime": "1895-02-01T00:00:00Z",
     "end_datetime": "1895-02-28T23:59:59Z",
-    "created": "2022-08-04T18:54:39.882442Z",
+    "created": "2022-08-24T19:39:59.274171Z",
     "datetime": null
   },
   "geometry": {
@@ -71,8 +71,8 @@
   "assets": {
     "prcp": {
       "href": "./nclimgrid-prcp-189502.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "title": "Monthly Precipitation (mm)",
-      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -87,8 +87,8 @@
     },
     "tavg": {
       "href": "./nclimgrid-tavg-189502.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "title": "Monthly Average Temperature (degree Celsius)",
-      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -103,8 +103,8 @@
     },
     "tmax": {
       "href": "./nclimgrid-tmax-189502.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "title": "Monthly Maximmum Temperature (degree Celsius)",
-      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -119,8 +119,8 @@
     },
     "tmin": {
       "href": "./nclimgrid-tmin-189502.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "title": "Monthly Minimum Temperature (degree Celsius)",
-      "media_type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -131,46 +131,6 @@
       ],
       "roles": [
         "data"
-      ]
-    },
-    "prcp_source": {
-      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_prcp.nc",
-      "title": "Monthly Precipitation Source Data",
-      "media_type": "application/netcdf",
-      "creation": "2021-01-12T11:12:04.092799Z",
-      "roles": [
-        "data",
-        "source"
-      ]
-    },
-    "tavg_source": {
-      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_tavg.nc",
-      "title": "Monthly Average Temperature Source Data",
-      "media_type": "application/netcdf",
-      "creation": "2021-01-12T11:43:15.039779Z",
-      "roles": [
-        "data",
-        "source"
-      ]
-    },
-    "tmax_source": {
-      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_tmax.nc",
-      "title": "Monthly Maximmum Temperature Source Data",
-      "media_type": "application/netcdf",
-      "creation": "2022-01-10T09:30:51.836115Z",
-      "roles": [
-        "data",
-        "source"
-      ]
-    },
-    "tmin_source": {
-      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_tmin.nc",
-      "title": "Monthly Minimum Temperature Source Data",
-      "media_type": "application/netcdf",
-      "creation": "2022-01-10T09:19:27.861550Z",
-      "roles": [
-        "data",
-        "source"
       ]
     }
   },
