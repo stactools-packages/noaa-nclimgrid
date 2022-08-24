@@ -1,7 +1,7 @@
 import os
 from calendar import monthrange
 from datetime import datetime, timezone
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
 import stactools.core.create
 from pystac import Asset, Collection, Item
@@ -94,7 +94,9 @@ def create_items(
     nc_href: str,
     cog_dir: str,
     nc_assets: bool = False,
-    short_circuit: Optional[Callable[[str], bool]] = None,
+    force_cog_creation: bool = False,
+    daily_range: Optional[Tuple(int, int)] = None,
+    monthly_range: Optional[Tuple(str, str)] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> List[Item]:
     """Creates STAC Items for all temporal units in set of netCDF files.
@@ -111,8 +113,9 @@ def create_items(
         cog_dir (str): Destination directory for COGs which will be created.
         nc_assets (bool): Flag to include Item assets for the source netCDF
             files. Default is False.
-        short_circuit (Optional[Callable[[str], bool]]): A placeholder
-            for an optional function that checks for existing Items and/or COGs.
+        force_cog_creation
+        daily_range
+        monthly_range
         read_href_modifier (Optional[ReadHrefModifier]): An optional function
             to modify an href (e.g., to add a token to a url).
 
