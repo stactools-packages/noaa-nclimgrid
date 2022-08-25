@@ -7,6 +7,8 @@ import rasterio
 import rasterio.shutil
 import xarray
 from rasterio.io import MemoryFile
+from stactools.core.utils import href_exists
+from stactools.core.io import ReadHrefModifier
 
 from stactools.noaa_nclimgrid.constants import Variable
 
@@ -62,6 +64,8 @@ def create_cogs(
     cog_dir: str,
     day: Optional[int] = None,
     month: Optional[Dict[str, Any]] = None,
+    cog_check_href: Optional[str] = None,
+    read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> Dict[Variable, str]:
     """Creates a prcp, tavg, tmax, and tmin COGS for a single temporal unit.
 
@@ -76,6 +80,12 @@ def create_cogs(
         month (Optional[Dict[str, Any]], optional): Months since January 1895
             where January 1895 is month=1. Used to index into the data
             timestacks. Only specify for monthly data.
+        cog_check_href (Optional[str]): HREF to a location to check for existing
+            COG files. This can be as simple as the same local directory as
+            `cog_href` or a remote directory, e.g., an Azure directory. New COGs
+            are not created if existing COGs are found.
+        read_href_modifier (Optional[ReadHrefModifier]): An optional function
+            to modify an href (e.g., to add a token to a url).
 
     Returns:
         Dict[Variable, str]: A dictionary mapping variables (keys) to COG HREFs
@@ -98,6 +108,15 @@ def create_cogs(
         cog_paths = {var: os.path.join(cog_dir, filenames[var]) for var in Variable}
 
     for var in Variable:
-        cog_time_slice(nc_hrefs[var], var, cog_paths[var], time_index)
+        cog_exists = False
+        if cog_check_href is not None:
+            check_href = os.path.join(cog_check_href, os.path.basename(cog_paths[var]))
+            if read_href_modifier is not None:
+                read_check_href = read_href_modifier(check_href)
+            else:
+                read_check_href = check_href
+            cog_exists = href_exists(read_check_href)
+        if not cog_exists:
+            cog_time_slice(nc_hrefs[var], var, cog_paths[var], time_index)
 
     return cog_paths

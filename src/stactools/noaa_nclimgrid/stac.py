@@ -11,6 +11,7 @@ from pystac.utils import make_absolute_href
 from stactools.core.io import ReadHrefModifier
 
 from stactools.noaa_nclimgrid import constants
+from stactools.noaa_nclimgrid import cog
 from stactools.noaa_nclimgrid.cog import create_cogs
 from stactools.noaa_nclimgrid.constants import Frequency, Variable
 from stactools.noaa_nclimgrid.utils import (
@@ -94,7 +95,7 @@ def create_items(
     nc_href: str,
     cog_dir: str,
     nc_assets: bool = False,
-    force_cog_creation: bool = False,
+    cog_check_href: Optional[str] = None,
     daily_range: Optional[Tuple(int, int)] = None,
     monthly_range: Optional[Tuple(str, str)] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
@@ -110,10 +111,13 @@ def create_items(
     Args:
         nc_href (str): HREF to a netCDF containing data for one of the four
             variables (prcp, tavg, tmax, tmin).
-        cog_dir (str): Destination directory for COGs which will be created.
+        cog_dir (str): Local destination directory for created COGs.
         nc_assets (bool): Flag to include Item assets for the source netCDF
             files. Default is False.
-        force_cog_creation
+        cog_check_href (Optional[str]): HREF to a location to check for existing
+            COG files. This can be as simple as the same local directory as
+            `cog_href` or a remote directory, e.g., an Azure directory. New COGs
+            are not created if existing COGs are found.
         daily_range
         monthly_range
         read_href_modifier (Optional[ReadHrefModifier]): An optional function
@@ -139,8 +143,14 @@ def create_items(
     if frequency == Frequency.DAILY:
         days = day_indices(read_nc_hrefs[Variable.PRCP])
         for day in days:
-            # TODO: short_circuit here
-            cog_paths = create_cogs(read_nc_hrefs, cog_dir, day=day)
+            # TODO: date range check here
+            cog_paths = create_cogs(
+                read_nc_hrefs,
+                cog_dir,
+                day=day,
+                cog_check_href=cog_check_href,
+                read_href_modifier=read_href_modifier,
+            )
             if nc_assets:
                 items.append(create_item(cog_paths, nc_hrefs, nc_creation_dates))
             else:
@@ -149,7 +159,7 @@ def create_items(
     else:
         months = month_indices(read_nc_hrefs[Variable.PRCP])
         for month in months:
-            # TODO: short_circuit here
+            # TODO: date range check here
             cog_paths = create_cogs(read_nc_hrefs, cog_dir, month=month)
             if nc_assets:
                 items.append(create_item(cog_paths, nc_hrefs, nc_creation_dates))

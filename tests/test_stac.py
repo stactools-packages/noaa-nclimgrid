@@ -166,3 +166,7 @@ def test_str_asset_keys() -> None:
     for key in item.assets.keys():
         assert type(key) == str
     item.validate()
+
+
+def test_check_cog_existence() -> None:
+    pass
