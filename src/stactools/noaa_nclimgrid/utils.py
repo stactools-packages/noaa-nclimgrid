@@ -1,6 +1,6 @@
 import operator
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import fsspec
 import xarray
@@ -75,7 +75,9 @@ def nc_href_dict(nc_href: str) -> Dict[Variable, str]:
 
 
 def day_indices(
-    nc_prcp_href: str, read_href_modifier: Optional[ReadHrefModifier] = None
+    nc_prcp_href: str,
+    daily_range: Optional[Tuple[int, int]] = None,
+    read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> List[int]:
     """Creates a list of days, in descending order, with valid precipitation
     data in a daily 'prcp' netCDF file.
@@ -87,11 +89,14 @@ def day_indices(
 
     Args:
         nc_prcp_href (str): HREF to daily netCDF precipitation file.
+        daily_range (Optional[Tuple[int, int]]): An optional tuple of desired
+            start and end day of month. For example: (<start_day_of_month>,
+            <end_day_of_month>)
         read_href_modifier (Optional[ReadHrefModifier]): An optional function
             to modify an href (e.g., to add a token to a url).
 
     Returns:
-        List[int]: List of days that have valid data.
+        List[int]: List of days, in descending order, that have valid data.
     """
     if Variable.PRCP not in os.path.basename(nc_prcp_href):
         raise ValueError(f"'{Variable.PRCP}' not detected in HREF: {nc_prcp_href}")
@@ -102,7 +107,19 @@ def day_indices(
             min_prcp = dataset.prcp.min(dim=("lat", "lon"), skipna=True).values
             days = sum(min_prcp >= 0)
 
-    return list(range(days, 0, -1))
+    if daily_range is not None:
+        if daily_range[0] <= daily_range[1]:
+            day_start = daily_range[0] if daily_range[0] > 1 else 1
+            day_end = daily_range[1] if daily_range[1] < days else days
+        else:
+            raise ValueError(
+                "The second element of 'daily_range' must be <= to the first element."
+            )
+    else:
+        day_start = 1
+        day_end = days
+
+    return list(range(day_end, day_start - 1, -1))
 
 
 def month_indices(

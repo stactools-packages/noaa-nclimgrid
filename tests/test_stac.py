@@ -144,3 +144,14 @@ def test_str_asset_keys() -> None:
     for key in item.assets.keys():
         assert type(key) == str
     item.validate()
+
+
+def test_daily_range() -> None:
+    nc_href = test_data.get_path(
+        "data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
+    )
+    daily_range = (1, 1)
+    with TemporaryDirectory() as cog_dir:
+        items, cogs = stac.create_items(nc_href, cog_dir, daily_range=daily_range)
+        assert len(items) == 1
+        assert len(cogs) == 4

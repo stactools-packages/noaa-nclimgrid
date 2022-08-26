@@ -1,7 +1,7 @@
 import logging
 import os
 from tempfile import TemporaryDirectory
-from typing import List
+from typing import List, Optional, Tuple
 
 import click
 from click import Command, Group
@@ -101,8 +101,26 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
         show_default=True,
         help="Include source netCDF file assets in Items",
     )
+    @click.option(
+        "-c",
+        "--cog-check-href",
+        type=str,
+        help="HREF to directory to check for existing COGs",
+    )
+    @click.option(
+        "-d",
+        "--daily-range",
+        nargs=2,
+        type=int,
+        help="Desired start and end day of month for daily data",
+    )
     def create_items_command(
-        infile: str, cogdir: str, itemdir: str, nc_assets: bool
+        infile: str,
+        cogdir: str,
+        itemdir: str,
+        nc_assets: bool,
+        cog_check_href: Optional[str] = None,
+        daily_range: Optional[Tuple[int, int]] = None,
     ) -> None:
         """Creates COGs and STAC Items for each day or month in the daily or
         monthly netCDF INFILE.
@@ -116,8 +134,21 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
             itemdir (str): Directory that will contain the STAC Items.
             nc_assets (bool): Flag to include source netCDF file assets in
                 created Items. Default is False.
+            cog_check_href (Optional[str]): HREF to a location to check for
+                existing COG files. New COGs are not created if existing COGs
+                are found. The `cog_check_href` can simply be the same local
+                directory as `cogdir` or a remote directory, e.g., an Azure
+                blob storage container.
+            daily_range (Optional[Tuple[int, int]]): Optional start and end day
+                of month for daily data
         """
-        items, _ = stac.create_items(infile, cogdir, nc_assets=nc_assets)
+        items, _ = stac.create_items(
+            infile,
+            cogdir,
+            nc_assets=nc_assets,
+            cog_check_href=cog_check_href,
+            daily_range=daily_range,
+        )
         for item in items:
             item_path = os.path.join(itemdir, f"{item.id}.json")
             item.set_self_href(item_path)

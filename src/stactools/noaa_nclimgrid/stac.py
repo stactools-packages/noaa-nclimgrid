@@ -139,12 +139,12 @@ def create_items(
     items: List[Item] = []
     created_cogs: List[str] = []
     if frequency == Frequency.DAILY:
-        # pass daily_range to this function
         days = day_indices(
-            nc_hrefs[Variable.PRCP], read_href_modifier=read_href_modifier
+            nc_hrefs[Variable.PRCP],
+            daily_range=daily_range,
+            read_href_modifier=read_href_modifier,
         )
         for day in days:
-            # how about a yield for a generator?
             cog_hrefs, created_cog_hrefs = create_cogs(
                 nc_hrefs,
                 cog_dir,
@@ -165,7 +165,6 @@ def create_items(
             nc_hrefs[Variable.PRCP], read_href_modifier=read_href_modifier
         )
         for month in months:
-            # how about a yield for a generator?
             cog_hrefs, created_cog_hrefs = create_cogs(
                 nc_hrefs,
                 cog_dir,
