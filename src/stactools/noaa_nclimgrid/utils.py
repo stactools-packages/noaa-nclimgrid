@@ -1,15 +1,35 @@
 import operator
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import fsspec
 import xarray
 from dateutil import parser
 from pystac import MediaType
 from pystac.utils import datetime_to_str
+from stactools.core.io import ReadHrefModifier
 
 from stactools.noaa_nclimgrid import constants
 from stactools.noaa_nclimgrid.constants import Frequency, Variable
+
+
+def modify_href(
+    href: str, read_href_modifier: Optional[ReadHrefModifier] = None
+) -> str:
+    """Modify an HREF with, for example, a token signature.
+
+    Args:
+        href (str): The HREF to be modified
+        read_href_modifier (Optional[ReadHrefModifier]): An optional function
+            to modify an href (e.g., to add a token to a url).
+
+    Returns:
+        str: The modified HREF.
+    """
+    if read_href_modifier:
+        return read_href_modifier(href)
+    else:
+        return href
 
 
 def data_frequency(href: str) -> Frequency:
@@ -54,7 +74,9 @@ def nc_href_dict(nc_href: str) -> Dict[Variable, str]:
     return href_dict
 
 
-def day_indices(nc_prcp_href: str) -> List[int]:
+def day_indices(
+    nc_prcp_href: str, read_href_modifier: Optional[ReadHrefModifier] = None
+) -> List[int]:
     """Creates a list of days, in descending order, with valid precipitation
     data in a daily 'prcp' netCDF file.
 
@@ -65,6 +87,8 @@ def day_indices(nc_prcp_href: str) -> List[int]:
 
     Args:
         nc_prcp_href (str): HREF to daily netCDF precipitation file.
+        read_href_modifier (Optional[ReadHrefModifier]): An optional function
+            to modify an href (e.g., to add a token to a url).
 
     Returns:
         List[int]: List of days that have valid data.
@@ -72,7 +96,8 @@ def day_indices(nc_prcp_href: str) -> List[int]:
     if Variable.PRCP not in os.path.basename(nc_prcp_href):
         raise ValueError(f"'{Variable.PRCP}' not detected in HREF: {nc_prcp_href}")
 
-    with fsspec.open(nc_prcp_href) as fobj:
+    read_nc_prcp_href = modify_href(nc_prcp_href, read_href_modifier=read_href_modifier)
+    with fsspec.open(read_nc_prcp_href) as fobj:
         with xarray.open_dataset(fobj) as dataset:
             min_prcp = dataset.prcp.min(dim=("lat", "lon"), skipna=True).values
             days = sum(min_prcp >= 0)
@@ -80,19 +105,25 @@ def day_indices(nc_prcp_href: str) -> List[int]:
     return list(range(days, 0, -1))
 
 
-def month_indices(nc_href: str) -> List[Dict[str, Any]]:
+def month_indices(
+    nc_href: str,
+    read_href_modifier: Optional[ReadHrefModifier] = None,
+) -> List[Dict[str, Any]]:
     """Creates a list of dictionaries, where each dictionary contains an index
     into the monthly netCDF data timestack and a corresponding yyyymm string
     indicating the year and month.
 
     Args:
         nc_href (str): HREF to a monthly netCDF file.
+        read_href_modifier (Optional[ReadHrefModifier]): An optional function
+            to modify an href (e.g., to add a token to a url).
 
     Returns:
         List[Dict[str, Any]]: List of dictionaries with index and timeslice
             information.
     """
-    with fsspec.open(nc_href) as fobj:
+    read_nc_href = modify_href(nc_href, read_href_modifier=read_href_modifier)
+    with fsspec.open(read_nc_href) as fobj:
         with xarray.open_dataset(fobj) as ds:
             years = ds.time.dt.year.data.tolist()
             months = ds.time.dt.month.data.tolist()
@@ -139,12 +170,16 @@ def nc_asset_dict(frequency: Frequency, var: Variable) -> Dict[str, Any]:
     }
 
 
-def nc_creation_date_dict(nc_hrefs: Dict[Variable, str]) -> Dict[Variable, str]:
+def nc_creation_date_dict(
+    nc_hrefs: Dict[Variable, str], read_href_modifier: Optional[ReadHrefModifier] = None
+) -> Dict[Variable, str]:
     """Returns a dictionary mapping variables to netCDF file creation dates.
 
     Args:
         nc_hrefs (Dict[Variable, str]): A dictionary mapping variables to netCDF
             HREFS.
+        read_href_modifier (Optional[ReadHrefModifier]): An optional function
+            to modify an href (e.g., to add a token to a url).
 
     Returns:
         Dict[Variable, str]: A dictionary mapping variables to netCDF file
@@ -152,7 +187,8 @@ def nc_creation_date_dict(nc_hrefs: Dict[Variable, str]) -> Dict[Variable, str]:
     """
     nc_creation_dates: Dict[Variable, str] = {}
     for var in Variable:
-        with fsspec.open(nc_hrefs[var]) as fobj:
+        read_nc_href = modify_href(nc_hrefs[var], read_href_modifier=read_href_modifier)
+        with fsspec.open(read_nc_href) as fobj:
             with xarray.open_dataset(fobj) as ds:
                 nc_creation_dates[var] = datetime_to_str(
                     parser.parse(ds.attrs["date_created"])

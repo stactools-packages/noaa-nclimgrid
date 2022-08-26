@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import fsspec
 import numpy as np
@@ -11,6 +11,7 @@ from stactools.core.io import ReadHrefModifier
 from stactools.core.utils import href_exists
 
 from stactools.noaa_nclimgrid.constants import Variable
+from stactools.noaa_nclimgrid.utils import modify_href
 
 TRANSFORM = [0.04166667, 0.0, -124.70833333, 0.0, -0.04166667, 49.37500127]
 
@@ -61,21 +62,20 @@ def cog_time_slice(
 
 def create_cogs(
     nc_hrefs: Dict[Variable, str],
-    cog_paths: Dict[Variable, str],
+    cog_dir: str,
     day: Optional[int] = None,
-    month: Optional[int] = None,
+    month: Optional[Dict[str, Any]] = None,
     cog_check_href: Optional[str] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
-) -> List[str]:
-    """Creates a prcp, tavg, tmax, and tmin COGS for a single temporal unit.
+) -> Tuple[Dict[Variable, str], List[str]]:
+    """Creates a prcp, tavg, tmax, and tmin COG for a single temporal unit.
 
     A temporal unit is a day for daily data or a month for monthly data.
 
     Args:
         nc_hrefs (Dict[Variable, str]): A dictionary mapping variables to netCDF
             HREFs.
-        cog_paths (Dict[Variable, str]): A dictionary mapping variables to
-            target COG HREFs.
+        cog_dir (str): Local directory path for created COGs.
         day (Optional[int], optional): Day of month. Used to index into the
             data timestacks. Only specify for daily data.
         month (Optional[int], optional): Months since January 1895 where January
@@ -89,71 +89,68 @@ def create_cogs(
             to modify an href (e.g., to add a token to a url).
 
     Returns:
-        List[str]: List of created COG HREFs.
+        Tuple[Dict[Variable, str], List[str]]: A tuple consisting of:
+            1. A dictionary mapping variables to COG HREFs. The HREFs may be to
+                existing or newly created COGs.
+            2. A list of HREFs to any newly created (not existing) COGs.
     """
-    if day:
-        time_index = day - 1
-    elif month:
-        time_index = month - 1
-
+    cog_hrefs = {}
+    created_cog_hrefs = []
     for var in Variable:
         cog_exists = False
         if cog_check_href is not None:
-            cog_exists = _check_cog_existence(
-                cog_paths[var], cog_check_href, read_href_modifier=read_href_modifier
+            existing_cog_href = get_cog_href(
+                nc_hrefs[var], var, cog_check_href, day=day, month=month
             )
-        if cog_exists:
-            cog_paths.pop(var)
-        else:
-            cog_time_slice(nc_hrefs[var], var, cog_paths[var], time_index)
+            read_existing_cog_href = modify_href(existing_cog_href)
+            if href_exists(read_existing_cog_href):
+                cog_exists = True
+                cog_hrefs[var] = existing_cog_href
 
-    return list(cog_paths.values())
+        if not cog_exists:
+            new_cog_path = get_cog_href(
+                nc_hrefs[var], var, cog_dir, day=day, month=month
+            )
+            read_nc_href = modify_href(nc_hrefs[var], read_href_modifier)
+            if day:
+                time_index = day - 1
+            elif month:
+                time_index = month["idx"] - 1
+            cog_time_slice(read_nc_href, var, new_cog_path, time_index)
+            cog_hrefs[var] = new_cog_path
+            created_cog_hrefs.append(new_cog_path)
+
+    return cog_hrefs, created_cog_hrefs
 
 
-def _check_cog_existence(
-    local_cog_path: str,
-    cog_check_href: str,
-    read_href_modifier: Optional[ReadHrefModifier] = None,
-) -> bool:
-    check_href = os.path.join(cog_check_href, os.path.basename(local_cog_path))
-    if read_href_modifier is not None:
-        read_check_href = read_href_modifier(check_href)
-    else:
-        read_check_href = check_href
-    return href_exists(read_check_href)
-
-
-def create_cog_paths(
-    nc_hrefs: Dict[Variable, str],
-    cog_dir: str,
+def get_cog_href(
+    nc_href: str,
+    var: Variable,
+    cog_dir_href: str,
     day: Optional[int] = None,
-    month: Optional[str] = None,
-) -> Dict[Variable, str]:
-    """Generate target local path and name for COGs.
+    month: Optional[Dict[str, Any]] = None,
+) -> str:
+    """Generates a daily or monthly COG href for a given variable, day or month,
+    and directory location.
 
     Args:
-        nc_hrefs (Dict[Variable, str]): Dictionary of NetCDF file HREFs
-        cog_dir (str): Target COG storage directory
-        day (Optional[int], optional): Day of month. Only specify for daily
-            data.
-        month (Optional[str], optional): YYYYMM string. Only specify for
-            monthly data.
+        nc_href (str): NetCDF file HREF
+        var (Variable): Variable
+        cog_dir_href (str): COG location
+        day (Optional[int], optional): Day of month. Used to index into the
+            data timestacks. Only specify for daily data.
+        month (Optional[int], optional): Months since January 1895 where January
+            1895 is month=1. Used to index into the data timestacks. Only
+            specify for monthly data.
 
     Returns:
-        Dict[Variable, str]: A dictionary mapping variables to target COG HREFs.
+        str: The daily or monthly COG HREF
     """
-    cog_paths = {}
     if day:
-        basenames = {
-            var: os.path.splitext(os.path.basename(nc_hrefs[var]))[0]
-            for var in Variable
-        }
-        cog_paths = {
-            var: os.path.join(cog_dir, f"{basenames[var]}-{day:02d}.tif")
-            for var in Variable
-        }
+        basename = os.path.splitext(os.path.basename(nc_href))[0]
+        cog_href = os.path.join(cog_dir_href, f"{basename}-{day:02d}.tif")
     elif month:
-        filenames = {var: f"nclimgrid-{var}-{month}.tif" for var in Variable}
-        cog_paths = {var: os.path.join(cog_dir, filenames[var]) for var in Variable}
+        filename = f"nclimgrid-{var.value}-{month['date']}.tif"
+        cog_href = os.path.join(cog_dir_href, filename)
 
-    return cog_paths
+    return cog_href

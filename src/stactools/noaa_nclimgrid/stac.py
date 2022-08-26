@@ -11,7 +11,7 @@ from pystac.utils import make_absolute_href
 from stactools.core.io import ReadHrefModifier
 
 from stactools.noaa_nclimgrid import constants
-from stactools.noaa_nclimgrid.cog import create_cog_paths, create_cogs
+from stactools.noaa_nclimgrid.cog import create_cogs
 from stactools.noaa_nclimgrid.constants import Frequency, Variable
 from stactools.noaa_nclimgrid.utils import (
     cog_asset_dict,
@@ -65,7 +65,6 @@ def create_item(
         end_datetime = datetime(year, month, monthrange(year, month)[1], 23, 59, 59)
         nominal_datetime = None
 
-    # What if the COG exists? The href is wrong. The correct href may need to be signed?
     item = stactools.core.create.item(cog_hrefs[Variable.PRCP])
     item.id = id
     item.datetime = nominal_datetime
@@ -75,7 +74,6 @@ def create_item(
 
     item.assets.pop("data")
     for var in Variable:
-        # move cog creation here
         asset = cog_asset_dict(frequency, var)
         asset["href"] = make_absolute_href(cog_hrefs[var])
         item.add_asset(var.value, Asset.from_dict(asset))
@@ -126,62 +124,61 @@ def create_items(
             to modify an href (e.g., to add a token to a url).
 
     Returns:
-        Tuple[List[Item], List[str]]: A list of created STAC Items and a list
-            of created COG HREFs.
+        Tuple[List[Item], List[str]]:
+            1. A list of created STAC Items.
+            2. A list of HREFs to any newly created COGs.
     """
     frequency = data_frequency(nc_href)
     nc_hrefs = nc_href_dict(nc_href)
 
-    if read_href_modifier:
-        read_nc_hrefs = {
-            var: read_href_modifier(nc_hrefs[var]) for var in nc_hrefs.keys()
-        }
-    else:
-        read_nc_hrefs = nc_hrefs
-
     if nc_assets:
-        nc_creation_dates = nc_creation_date_dict(read_nc_hrefs)
+        nc_creation_dates = nc_creation_date_dict(
+            nc_hrefs, read_href_modifier=read_href_modifier
+        )
 
     items: List[Item] = []
     created_cogs: List[str] = []
     if frequency == Frequency.DAILY:
         # pass daily_range to this function
-        days = day_indices(read_nc_hrefs[Variable.PRCP])
+        days = day_indices(
+            nc_hrefs[Variable.PRCP], read_href_modifier=read_href_modifier
+        )
         for day in days:
             # how about a yield for a generator?
-            cog_paths = create_cog_paths(nc_hrefs, cog_dir, day=day)
-            created_cogs.extend(
-                create_cogs(
-                    read_nc_hrefs,
-                    cog_paths.copy(),
-                    day=day,
-                    cog_check_href=cog_check_href,
-                    read_href_modifier=read_href_modifier,
-                )
+            cog_hrefs, created_cog_hrefs = create_cogs(
+                nc_hrefs,
+                cog_dir,
+                day=day,
+                cog_check_href=cog_check_href,
+                read_href_modifier=read_href_modifier,
             )
+            created_cogs.extend(created_cog_hrefs)
+
             if nc_assets:
-                items.append(create_item(cog_paths, nc_hrefs, nc_creation_dates))
+                items.append(create_item(cog_hrefs, nc_hrefs, nc_creation_dates))
             else:
-                items.append(create_item(cog_paths))
+                items.append(create_item(cog_hrefs))
 
     else:
         # pass monthly_range to this function
-        months = month_indices(read_nc_hrefs[Variable.PRCP])
+        months = month_indices(
+            nc_hrefs[Variable.PRCP], read_href_modifier=read_href_modifier
+        )
         for month in months:
-            cog_paths = create_cog_paths(nc_hrefs, cog_dir, month=month["date"])
-            created_cogs.extend(
-                create_cogs(
-                    read_nc_hrefs,
-                    cog_paths.copy(),
-                    month=month["idx"],
-                    cog_check_href=cog_check_href,
-                    read_href_modifier=read_href_modifier,
-                )
+            # how about a yield for a generator?
+            cog_hrefs, created_cog_hrefs = create_cogs(
+                nc_hrefs,
+                cog_dir,
+                month=month,
+                cog_check_href=cog_check_href,
+                read_href_modifier=read_href_modifier,
             )
+            created_cogs.extend(created_cog_hrefs)
+
             if nc_assets:
-                items.append(create_item(cog_paths, nc_hrefs, nc_creation_dates))
+                items.append(create_item(cog_hrefs, nc_hrefs, nc_creation_dates))
             else:
-                items.append(create_item(cog_paths))
+                items.append(create_item(cog_hrefs))
 
     return (items, created_cogs)
 

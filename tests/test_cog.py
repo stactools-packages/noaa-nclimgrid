@@ -1,5 +1,4 @@
 from tempfile import TemporaryDirectory
-from typing import Optional
 
 from stactools.noaa_nclimgrid import cog
 from stactools.noaa_nclimgrid.constants import Variable
@@ -22,16 +21,16 @@ def test_check_cog_existence() -> None:
         ),
     }
     with TemporaryDirectory() as cog_dir:
-        month_idx: Optional[int] = 1
-        month_date: Optional[str] = "189502"
-        target_cog_paths = cog.create_cog_paths(nc_hrefs, cog_dir, month=month_date)
+        month = {"idx": 1, "date": "189502"}
         for var in [Variable.PRCP, Variable.TAVG]:
-            with open(target_cog_paths[var], "w") as _:
+            target_cog_path = cog.get_cog_href(nc_hrefs[var], var, cog_dir, month=month)
+            with open(target_cog_path, "w") as _:
                 pass
-        created_cog_paths = cog.create_cogs(
-            nc_hrefs, target_cog_paths, month=month_idx, cog_check_href=cog_dir
+        cog_hrefs, created_cog_hrefs = cog.create_cogs(
+            nc_hrefs, cog_dir, month=month, cog_check_href=cog_dir
         )
-        assert len(created_cog_paths) == 2
+        assert len(cog_hrefs) == 4
+        assert len(created_cog_hrefs) == 2
 
 
 def test_create_cogs() -> None:
@@ -50,8 +49,9 @@ def test_create_cogs() -> None:
         ),
     }
     with TemporaryDirectory() as cog_dir:
-        month_idx: Optional[int] = 1
-        month_date: Optional[str] = "189502"
-        target_cog_paths = cog.create_cog_paths(nc_hrefs, cog_dir, month=month_date)
-        created_cog_paths = cog.create_cogs(nc_hrefs, target_cog_paths, month=month_idx)
-        assert len(created_cog_paths) == 4
+        month = {"idx": 1, "date": "189502"}
+        cog_hrefs, created_cog_hrefs = cog.create_cogs(
+            nc_hrefs, cog_dir, month=month, cog_check_href=cog_dir
+        )
+        assert len(cog_hrefs) == 4
+        assert len(created_cog_hrefs) == 4
