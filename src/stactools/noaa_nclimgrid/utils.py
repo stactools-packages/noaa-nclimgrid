@@ -76,7 +76,7 @@ def nc_href_dict(nc_href: str) -> Dict[Variable, str]:
 
 def day_indices(
     nc_prcp_href: str,
-    daily_range: Optional[Tuple[int, int]] = None,
+    day_range: Optional[Tuple[int, int]] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> List[int]:
     """Creates a list of days, in descending order, with valid precipitation
@@ -89,9 +89,9 @@ def day_indices(
 
     Args:
         nc_prcp_href (str): HREF to daily netCDF precipitation file.
-        daily_range (Optional[Tuple[int, int]]): An optional tuple of desired
+        day_range (Optional[Tuple[int, int]]): An optional tuple of desired
             start and end day of month. For example: (<start_day_of_month>,
-            <end_day_of_month>)
+            <end_day_of_month>).
         read_href_modifier (Optional[ReadHrefModifier]): An optional function
             to modify an href (e.g., to add a token to a url).
 
@@ -107,14 +107,20 @@ def day_indices(
             min_prcp = dataset.prcp.min(dim=("lat", "lon"), skipna=True).values
             days = sum(min_prcp >= 0)
 
-    if daily_range is not None:
-        if daily_range[0] <= daily_range[1]:
-            day_start = daily_range[0] if daily_range[0] > 1 else 1
-            day_end = daily_range[1] if daily_range[1] < days else days
-        else:
+    if day_range:
+        if day_range[0] < 1:
+            raise ValueError("Minimum day in 'day_range' must be >= 1")
+        elif day_range[1] > days:
             raise ValueError(
-                "The second element of 'daily_range' must be <= to the first element."
+                "Maximum day in 'day_range' is posterior to available data"
             )
+        elif day_range[0] > day_range[1]:
+            raise ValueError(
+                "The second element of 'day_range' must be >= to the first element."
+            )
+        else:
+            day_start = day_range[0] if day_range[0] > 1 else 1
+            day_end = day_range[1] if day_range[1] < days else days
     else:
         day_start = 1
         day_end = days
@@ -124,6 +130,7 @@ def day_indices(
 
 def month_indices(
     nc_href: str,
+    month_range: Optional[Tuple[str, str]] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> List[Dict[str, Any]]:
     """Creates a list of dictionaries, where each dictionary contains an index
@@ -132,12 +139,15 @@ def month_indices(
 
     Args:
         nc_href (str): HREF to a monthly netCDF file.
+        month_range (Optional[Tuple[str, str]]): An optional tuple of desired
+            start and end YYYYMM date strings. For example: (<start_YYYYMM>,
+            <end_YYYYMM>).
         read_href_modifier (Optional[ReadHrefModifier]): An optional function
             to modify an href (e.g., to add a token to a url).
 
     Returns:
-        List[Dict[str, Any]]: List of dictionaries with index and timeslice
-            information.
+        List[Dict[str, Any]]: List of dictionaries with indices into the NetCDF
+            timestack and corresponding YYYYMM date strings for each time slice.
     """
     read_nc_href = modify_href(nc_href, read_href_modifier=read_href_modifier)
     with fsspec.open(read_nc_href) as fobj:
@@ -145,9 +155,30 @@ def month_indices(
             years = ds.time.dt.year.data.tolist()
             months = ds.time.dt.month.data.tolist()
 
-    idx_month = []
+    idx_month: List[Dict[str, Any]] = []
     for idx, (year, month) in enumerate(zip(years, months), start=1):
         idx_month.append({"idx": idx, "date": f"{year}{month:02d}"})
+
+    if month_range:
+        idx_month.sort(key=operator.itemgetter("idx"))
+        if int(month_range[0]) < int(idx_month[0]["date"]):
+            raise ValueError(
+                f"'month_range' start YYYYMM ({month_range[0]}) is prior to available data"
+            )
+        elif int(month_range[1]) > int(idx_month[-1]["date"]):
+            raise ValueError(
+                f"'month_range' start YYYYMM ({month_range[1]}) is posterior to available data"
+            )
+        elif int(month_range[0]) > int(month_range[1]):
+            raise ValueError(
+                "The second element of 'month_range' must be >= to the first element."
+            )
+        else:
+            idx_month = [
+                m
+                for m in idx_month
+                if int(month_range[0]) <= int(m["date"]) <= int(month_range[1])
+            ]
 
     idx_month.sort(key=operator.itemgetter("idx"), reverse=True)
 

@@ -146,12 +146,21 @@ def test_str_asset_keys() -> None:
     item.validate()
 
 
-def test_daily_range() -> None:
+def test_day_range() -> None:
     nc_href = test_data.get_path(
         "data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
     )
-    daily_range = (1, 1)
+    day_range = (1, 1)
     with TemporaryDirectory() as cog_dir:
-        items, cogs = stac.create_items(nc_href, cog_dir, daily_range=daily_range)
+        items, cogs = stac.create_items(nc_href, cog_dir, day_range=day_range)
+        assert len(items) == 1
+        assert len(cogs) == 4
+
+
+def test_month_range() -> None:
+    nc_href = test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc")
+    month_range = ("189501", "189501")
+    with TemporaryDirectory() as cog_dir:
+        items, cogs = stac.create_items(nc_href, cog_dir, month_range=month_range)
         assert len(items) == 1
         assert len(cogs) == 4

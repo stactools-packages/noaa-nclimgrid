@@ -95,11 +95,11 @@ def create_items(
     cog_dir: str,
     nc_assets: bool = False,
     cog_check_href: Optional[str] = None,
-    daily_range: Optional[Tuple[int, int]] = None,
-    monthly_range: Optional[Tuple[str, str]] = None,
+    day_range: Optional[Tuple[int, int]] = None,
+    month_range: Optional[Tuple[str, str]] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> Tuple[List[Item], List[str]]:
-    """Creates STAC Items for all temporal units in set of netCDF files.
+    """Creates STAC Items for temporal units in set of netCDF files.
 
     A temporal unit is a day for daily data or a month for monthly data. A set
     of netCDF files refers to 'prcp', 'tavg', 'tmin', and 'tmax'
@@ -118,8 +118,12 @@ def create_items(
             `cog_check_href` can simply be the same local directory as
             `cog_href` or a remote directory, e.g., an Azure blob storage
             container.
-        daily_range
-        monthly_range
+        day_range (Optional[Tuple[int, int]]): An optional tuple of desired
+            start and end day of month for daily data. For example:
+            (<start_day_of_month>, <end_day_of_month>)
+        month_range (Optional[Tuple[str, str]]): An optional tuple of desired
+            start and end YYYYMM date strings. For example: (<start_YYYYMM>,
+            <end_YYYYMM>).
         read_href_modifier (Optional[ReadHrefModifier]): An optional function
             to modify an href (e.g., to add a token to a url).
 
@@ -141,7 +145,7 @@ def create_items(
     if frequency == Frequency.DAILY:
         days = day_indices(
             nc_hrefs[Variable.PRCP],
-            daily_range=daily_range,
+            day_range=day_range,
             read_href_modifier=read_href_modifier,
         )
         for day in days:
@@ -160,9 +164,10 @@ def create_items(
                 items.append(create_item(cog_hrefs))
 
     else:
-        # pass monthly_range to this function
         months = month_indices(
-            nc_hrefs[Variable.PRCP], read_href_modifier=read_href_modifier
+            nc_hrefs[Variable.PRCP],
+            month_range=month_range,
+            read_href_modifier=read_href_modifier,
         )
         for month in months:
             cog_hrefs, created_cog_hrefs = create_cogs(

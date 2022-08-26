@@ -109,10 +109,17 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
     )
     @click.option(
         "-d",
-        "--daily-range",
+        "--day-range",
         nargs=2,
         type=int,
         help="Desired start and end day of month for daily data",
+    )
+    @click.option(
+        "-m",
+        "--month-range",
+        nargs=2,
+        type=str,
+        help="Desired start and end month in YYYYMM format for monthly data",
     )
     def create_items_command(
         infile: str,
@@ -120,7 +127,8 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
         itemdir: str,
         nc_assets: bool,
         cog_check_href: Optional[str] = None,
-        daily_range: Optional[Tuple[int, int]] = None,
+        day_range: Optional[Tuple[int, int]] = None,
+        month_range: Optional[Tuple[str, str]] = None,
     ) -> None:
         """Creates COGs and STAC Items for each day or month in the daily or
         monthly netCDF INFILE.
@@ -139,15 +147,18 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
                 are found. The `cog_check_href` can simply be the same local
                 directory as `cogdir` or a remote directory, e.g., an Azure
                 blob storage container.
-            daily_range (Optional[Tuple[int, int]]): Optional start and end day
+            day_range (Optional[Tuple[int, int]]): Optional start and end day
                 of month for daily data
+            month_range (Optional[Tuple[int, int]]): Optional start and end
+                month in YYYYMM format for monthly data.
         """
         items, _ = stac.create_items(
             infile,
             cogdir,
             nc_assets=nc_assets,
             cog_check_href=cog_check_href,
-            daily_range=daily_range,
+            day_range=day_range,
+            month_range=month_range,
         )
         for item in items:
             item_path = os.path.join(itemdir, f"{item.id}.json")
