@@ -1,10 +1,11 @@
 import logging
 import os
 from tempfile import TemporaryDirectory
+from typing import List
 
 import click
 from click import Command, Group
-from pystac import CatalogType
+from pystac import CatalogType, Item
 from stactools.core.copy import move_asset_file_to_item
 
 from stactools.noaa_nclimgrid import stac
@@ -57,11 +58,11 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
         with open(infile) as f:
             hrefs = [os.path.abspath(line.strip()) for line in f.readlines()]
 
-        items = []
+        items: List[Item] = []
         frequency = data_frequency(hrefs[0])
         with TemporaryDirectory() as cog_dir:
             for href in hrefs:
-                temp_items = stac.create_items(href, cog_dir, nc_assets=nc_assets)
+                temp_items, _ = stac.create_items(href, cog_dir, nc_assets=nc_assets)
                 items.extend(temp_items)
 
             collection = stac.create_collection(frequency, nc_assets)
@@ -116,7 +117,7 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
             nc_assets (bool): Flag to include source netCDF file assets in
                 created Items. Default is False.
         """
-        items = stac.create_items(infile, cogdir, nc_assets=nc_assets)
+        items, _ = stac.create_items(infile, cogdir, nc_assets=nc_assets)
         for item in items:
             item_path = os.path.join(itemdir, f"{item.id}.json")
             item.set_self_href(item_path)
