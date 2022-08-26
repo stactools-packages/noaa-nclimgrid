@@ -1,7 +1,7 @@
 import os
 from calendar import monthrange
 from datetime import datetime, timezone
-from typing import Callable, Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import stactools.core.create
 from pystac import Asset, Collection, Item
@@ -94,10 +94,12 @@ def create_items(
     nc_href: str,
     cog_dir: str,
     nc_assets: bool = False,
-    short_circuit: Optional[Callable[[str], bool]] = None,
+    cog_check_href: Optional[str] = None,
+    day_range: Optional[Tuple[int, int]] = None,
+    month_range: Optional[Tuple[str, str]] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
-) -> List[Item]:
-    """Creates STAC Items for all temporal units in set of netCDF files.
+) -> Tuple[List[Item], List[str]]:
+    """Creates STAC Items for temporal units in set of netCDF files.
 
     A temporal unit is a day for daily data or a month for monthly data. A set
     of netCDF files refers to 'prcp', 'tavg', 'tmin', and 'tmax'
@@ -108,52 +110,81 @@ def create_items(
     Args:
         nc_href (str): HREF to a netCDF containing data for one of the four
             variables (prcp, tavg, tmax, tmin).
-        cog_dir (str): Destination directory for COGs which will be created.
+        cog_dir (str): Local destination directory for created COGs.
         nc_assets (bool): Flag to include Item assets for the source netCDF
             files. Default is False.
-        short_circuit (Optional[Callable[[str], bool]]): A placeholder
-            for an optional function that checks for existing Items and/or COGs.
+        cog_check_href (Optional[str]): HREF to a location to check for existing
+            COG files. New COGs are not created if existing COGs are found. The
+            `cog_check_href` can simply be the same local directory as
+            `cog_href` or a remote directory, e.g., an Azure blob storage
+            container.
+        day_range (Optional[Tuple[int, int]]): An optional tuple of desired
+            start and end day of month for daily data. For example:
+            (<start_day_of_month>, <end_day_of_month>)
+        month_range (Optional[Tuple[str, str]]): An optional tuple of desired
+            start and end YYYYMM date strings. For example: (<start_YYYYMM>,
+            <end_YYYYMM>).
         read_href_modifier (Optional[ReadHrefModifier]): An optional function
             to modify an href (e.g., to add a token to a url).
 
     Returns:
-        List[Item]: A list of the created STAC Items.
+        Tuple[List[Item], List[str]]:
+            1. A list of created STAC Items.
+            2. A list of HREFs to any newly created COGs.
     """
     frequency = data_frequency(nc_href)
     nc_hrefs = nc_href_dict(nc_href)
 
-    if read_href_modifier:
-        read_nc_hrefs = {
-            var: read_href_modifier(nc_hrefs[var]) for var in nc_hrefs.keys()
-        }
-    else:
-        read_nc_hrefs = nc_hrefs
-
     if nc_assets:
-        nc_creation_dates = nc_creation_date_dict(read_nc_hrefs)
+        nc_creation_dates = nc_creation_date_dict(
+            nc_hrefs, read_href_modifier=read_href_modifier
+        )
 
     items: List[Item] = []
+    created_cogs: List[str] = []
     if frequency == Frequency.DAILY:
-        days = day_indices(read_nc_hrefs[Variable.PRCP])
+        days = day_indices(
+            nc_hrefs[Variable.PRCP],
+            day_range=day_range,
+            read_href_modifier=read_href_modifier,
+        )
         for day in days:
-            # TODO: short_circuit here
-            cog_paths = create_cogs(read_nc_hrefs, cog_dir, day=day)
+            cog_hrefs, created_cog_hrefs = create_cogs(
+                nc_hrefs,
+                cog_dir,
+                day=day,
+                cog_check_href=cog_check_href,
+                read_href_modifier=read_href_modifier,
+            )
+            created_cogs.extend(created_cog_hrefs)
+
             if nc_assets:
-                items.append(create_item(cog_paths, nc_hrefs, nc_creation_dates))
+                items.append(create_item(cog_hrefs, nc_hrefs, nc_creation_dates))
             else:
-                items.append(create_item(cog_paths))
+                items.append(create_item(cog_hrefs))
 
     else:
-        months = month_indices(read_nc_hrefs[Variable.PRCP])
+        months = month_indices(
+            nc_hrefs[Variable.PRCP],
+            month_range=month_range,
+            read_href_modifier=read_href_modifier,
+        )
         for month in months:
-            # TODO: short_circuit here
-            cog_paths = create_cogs(read_nc_hrefs, cog_dir, month=month)
-            if nc_assets:
-                items.append(create_item(cog_paths, nc_hrefs, nc_creation_dates))
-            else:
-                items.append(create_item(cog_paths))
+            cog_hrefs, created_cog_hrefs = create_cogs(
+                nc_hrefs,
+                cog_dir,
+                month=month,
+                cog_check_href=cog_check_href,
+                read_href_modifier=read_href_modifier,
+            )
+            created_cogs.extend(created_cog_hrefs)
 
-    return items
+            if nc_assets:
+                items.append(create_item(cog_hrefs, nc_hrefs, nc_creation_dates))
+            else:
+                items.append(create_item(cog_hrefs))
+
+    return (items, created_cogs)
 
 
 def create_collection(frequency: Frequency, nc_assets: bool = False) -> Collection:

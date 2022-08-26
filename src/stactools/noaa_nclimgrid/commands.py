@@ -1,10 +1,11 @@
 import logging
 import os
 from tempfile import TemporaryDirectory
+from typing import List, Optional, Tuple
 
 import click
 from click import Command, Group
-from pystac import CatalogType
+from pystac import CatalogType, Item
 from stactools.core.copy import move_asset_file_to_item
 
 from stactools.noaa_nclimgrid import stac
@@ -57,11 +58,11 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
         with open(infile) as f:
             hrefs = [os.path.abspath(line.strip()) for line in f.readlines()]
 
-        items = []
+        items: List[Item] = []
         frequency = data_frequency(hrefs[0])
         with TemporaryDirectory() as cog_dir:
             for href in hrefs:
-                temp_items = stac.create_items(href, cog_dir, nc_assets=nc_assets)
+                temp_items, _ = stac.create_items(href, cog_dir, nc_assets=nc_assets)
                 items.extend(temp_items)
 
             collection = stac.create_collection(frequency, nc_assets)
@@ -100,8 +101,34 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
         show_default=True,
         help="Include source netCDF file assets in Items",
     )
+    @click.option(
+        "-c",
+        "--cog-check-href",
+        type=str,
+        help="HREF to directory to check for existing COGs",
+    )
+    @click.option(
+        "-d",
+        "--day-range",
+        nargs=2,
+        type=int,
+        help="Desired start and end day of month for daily data",
+    )
+    @click.option(
+        "-m",
+        "--month-range",
+        nargs=2,
+        type=str,
+        help="Desired start and end month in YYYYMM format for monthly data",
+    )
     def create_items_command(
-        infile: str, cogdir: str, itemdir: str, nc_assets: bool
+        infile: str,
+        cogdir: str,
+        itemdir: str,
+        nc_assets: bool,
+        cog_check_href: Optional[str] = None,
+        day_range: Optional[Tuple[int, int]] = None,
+        month_range: Optional[Tuple[str, str]] = None,
     ) -> None:
         """Creates COGs and STAC Items for each day or month in the daily or
         monthly netCDF INFILE.
@@ -115,8 +142,24 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
             itemdir (str): Directory that will contain the STAC Items.
             nc_assets (bool): Flag to include source netCDF file assets in
                 created Items. Default is False.
+            cog_check_href (Optional[str]): HREF to a location to check for
+                existing COG files. New COGs are not created if existing COGs
+                are found. The `cog_check_href` can simply be the same local
+                directory as `cogdir` or a remote directory, e.g., an Azure
+                blob storage container.
+            day_range (Optional[Tuple[int, int]]): Optional start and end day
+                of month for daily data
+            month_range (Optional[Tuple[int, int]]): Optional start and end
+                month in YYYYMM format for monthly data.
         """
-        items = stac.create_items(infile, cogdir, nc_assets=nc_assets)
+        items, _ = stac.create_items(
+            infile,
+            cogdir,
+            nc_assets=nc_assets,
+            cog_check_href=cog_check_href,
+            day_range=day_range,
+            month_range=month_range,
+        )
         for item in items:
             item_path = os.path.join(itemdir, f"{item.id}.json")
             item.set_self_href(item_path)

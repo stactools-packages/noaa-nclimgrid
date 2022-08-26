@@ -1,7 +1,6 @@
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Optional
 
-from stactools.noaa_nclimgrid import cog, stac
+from stactools.noaa_nclimgrid import stac
 from stactools.noaa_nclimgrid.constants import Frequency, Variable
 from tests import test_data
 
@@ -9,7 +8,7 @@ from tests import test_data
 def test_create_monthly_items_local() -> None:
     nc_href = test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc")
     with TemporaryDirectory() as cog_dir:
-        items = stac.create_items(nc_href, cog_dir)
+        items, _ = stac.create_items(nc_href, cog_dir)
         assert len(items) == 2
         for item in items:
             item.validate()
@@ -27,7 +26,7 @@ def test_create_monthly_items_local() -> None:
 def test_create_monthly_items_with_netcdf_assets() -> None:
     nc_href = test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc")
     with TemporaryDirectory() as cog_dir:
-        items = stac.create_items(nc_href, cog_dir, nc_assets=True)
+        items, _ = stac.create_items(nc_href, cog_dir, nc_assets=True)
         assert len(items) == 2
         for item in items:
             assert len(item.assets) == 8
@@ -39,7 +38,7 @@ def test_create_daily_items_local() -> None:
         "data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
     )
     with TemporaryDirectory() as cog_dir:
-        items = stac.create_items(nc_href, cog_dir)
+        items, _ = stac.create_items(nc_href, cog_dir)
         assert len(items) == 1
         for item in items:
             item.validate()
@@ -59,7 +58,7 @@ def test_create_daily_items_with_netcdf_assets() -> None:
         "data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
     )
     with TemporaryDirectory() as cog_dir:
-        items = stac.create_items(nc_href, cog_dir, nc_assets=True)
+        items, _ = stac.create_items(nc_href, cog_dir, nc_assets=True)
         assert len(items) == 1
         for item in items:
             assert len(item.assets) == 8
@@ -85,27 +84,6 @@ def test_create_single_item() -> None:
     assert item.id == "nclimgrid-189501"
     assert len(item.assets) == 4
     item.validate()
-
-
-def test_create_cogs() -> None:
-    nc_hrefs = {
-        Variable.PRCP: test_data.get_path(
-            "data-files/netcdf/monthly/nclimgrid_prcp.nc"
-        ),
-        Variable.TAVG: test_data.get_path(
-            "data-files/netcdf/monthly/nclimgrid_tavg.nc"
-        ),
-        Variable.TMAX: test_data.get_path(
-            "data-files/netcdf/monthly/nclimgrid_tmax.nc"
-        ),
-        Variable.TMIN: test_data.get_path(
-            "data-files/netcdf/monthly/nclimgrid_tmin.nc"
-        ),
-    }
-    with TemporaryDirectory() as cog_dir:
-        month: Optional[Dict[str, Any]] = {"idx": 1, "date": "189502"}
-        cog_paths = cog.create_cogs(nc_hrefs, cog_dir, month=month)
-        assert len(cog_paths) == 4
 
 
 def test_read_href_modifier() -> None:
@@ -166,3 +144,23 @@ def test_str_asset_keys() -> None:
     for key in item.assets.keys():
         assert type(key) == str
     item.validate()
+
+
+def test_day_range() -> None:
+    nc_href = test_data.get_path(
+        "data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-prelim.nc"
+    )
+    day_range = (1, 1)
+    with TemporaryDirectory() as cog_dir:
+        items, cogs = stac.create_items(nc_href, cog_dir, day_range=day_range)
+        assert len(items) == 1
+        assert len(cogs) == 4
+
+
+def test_month_range() -> None:
+    nc_href = test_data.get_path("data-files/netcdf/monthly/nclimgrid_prcp.nc")
+    month_range = ("189501", "189501")
+    with TemporaryDirectory() as cog_dir:
+        items, cogs = stac.create_items(nc_href, cog_dir, month_range=month_range)
+        assert len(items) == 1
+        assert len(cogs) == 4
