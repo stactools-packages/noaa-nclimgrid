@@ -14,13 +14,13 @@ def test_create_monthly_items_local() -> None:
             item.validate()
 
 
-# def test_create_monthly_items_remote() -> None:
-#     nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/monthly/nclimgrid_prcp.nc"  # noqa
-#     with TemporaryDirectory() as cog_dir:
-#         items = stac.create_items(nc_href, cog_dir)
-#         assert len(items) == 2
-#         for item in items:
-#             item.validate()
+def test_create_monthly_items_remote() -> None:
+    nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/monthly/nclimgrid_prcp.nc"  # noqa
+    with TemporaryDirectory() as cog_dir:
+        items, _ = stac.create_items(nc_href, cog_dir)
+        assert len(items) == 2
+        for item in items:
+            item.validate()
 
 
 def test_create_monthly_items_with_netcdf_assets() -> None:
@@ -44,13 +44,13 @@ def test_create_daily_items_local() -> None:
             item.validate()
 
 
-# def test_create_daily_items_remote() -> None:
-#     nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/daily/prcp-202201-grd-prelim.nc"  # noqa
-#     with TemporaryDirectory() as cog_dir:
-#         items = stac.create_items(nc_href, cog_dir)
-#         assert len(items) == 1
-#         for item in items:
-#             item.validate()
+def test_create_daily_items_remote() -> None:
+    nc_href = "https://ai4epublictestdata.blob.core.windows.net/stactools/nclimgrid/daily/prcp-202201-grd-prelim.nc"  # noqa
+    with TemporaryDirectory() as cog_dir:
+        items, _ = stac.create_items(nc_href, cog_dir)
+        assert len(items) == 1
+        for item in items:
+            item.validate()
 
 
 def test_create_daily_items_with_netcdf_assets() -> None:
