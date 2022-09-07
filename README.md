@@ -56,7 +56,7 @@ $ stac noaa-nclimgrid create-collection <text file path> <output directory>
 
 For example, the monthly Collection, Items, and COGs found in the `examples/monthly` directory can be created with:
 ```shell
-$ stac noaa-nclimgrid create-collection examples/file-list-monthly.txt examples
+$ stac noaa-nclimgrid create-collection --nc-assets examples/file-list-monthly.txt examples
 ```
 
 ## Contributing

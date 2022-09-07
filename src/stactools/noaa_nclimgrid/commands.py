@@ -33,7 +33,7 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
     @click.argument("OUTDIR")
     @click.option(
         "-n",
-        "--nc_assets",
+        "--nc-assets",
         is_flag=True,
         default=False,
         show_default=True,

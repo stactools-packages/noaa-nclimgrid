@@ -112,6 +112,38 @@
           "spatial_resolution": 5000
         }
       ]
+    },
+    "prcp_source": {
+      "type": "application/netcdf",
+      "roles": [
+        "data",
+        "source"
+      ],
+      "title": "Monthly Precipitation Source Data"
+    },
+    "tavg_source": {
+      "type": "application/netcdf",
+      "roles": [
+        "data",
+        "source"
+      ],
+      "title": "Monthly Average Temperature Source Data"
+    },
+    "tmax_source": {
+      "type": "application/netcdf",
+      "roles": [
+        "data",
+        "source"
+      ],
+      "title": "Monthly Maximmum Temperature Source Data"
+    },
+    "tmin_source": {
+      "type": "application/netcdf",
+      "roles": [
+        "data",
+        "source"
+      ],
+      "title": "Monthly Minimum Temperature Source Data"
     }
   },
   "title": "NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)",

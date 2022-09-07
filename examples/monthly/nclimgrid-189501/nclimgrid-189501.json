@@ -18,7 +18,7 @@
     ],
     "start_datetime": "1895-01-01T00:00:00Z",
     "end_datetime": "1895-01-31T23:59:59Z",
-    "created": "2022-08-24T19:40:00.687872Z",
+    "created": "2022-09-07T14:16:47.978277Z",
     "datetime": null
   },
   "geometry": {
@@ -131,6 +131,46 @@
       ],
       "roles": [
         "data"
+      ]
+    },
+    "prcp_source": {
+      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_prcp.nc",
+      "type": "application/netcdf",
+      "title": "Monthly Precipitation Source Data",
+      "created": "2021-01-12T11:12:04.092799Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    },
+    "tavg_source": {
+      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_tavg.nc",
+      "type": "application/netcdf",
+      "title": "Monthly Average Temperature Source Data",
+      "created": "2021-01-12T11:43:15.039779Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    },
+    "tmax_source": {
+      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_tmax.nc",
+      "type": "application/netcdf",
+      "title": "Monthly Maximmum Temperature Source Data",
+      "created": "2022-01-10T09:30:51.836115Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    },
+    "tmin_source": {
+      "href": "../../../tests/data-files/netcdf/monthly/nclimgrid_tmin.nc",
+      "type": "application/netcdf",
+      "title": "Monthly Minimum Temperature Source Data",
+      "created": "2022-01-10T09:19:27.861550Z",
+      "roles": [
+        "data",
+        "source"
       ]
     }
   },

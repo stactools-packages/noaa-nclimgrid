@@ -82,7 +82,7 @@ def create_item(
             asset = nc_asset_dict(frequency, var)
             asset["href"] = make_absolute_href(nc_hrefs[var])
             if nc_creation_dates:
-                asset["creation"] = nc_creation_dates[var]
+                asset["created"] = nc_creation_dates[var]
             item.add_asset(f"{var.value}_source", Asset.from_dict(asset))
 
     item.stac_extensions.append(constants.RASTER_EXTENSION_V11)
