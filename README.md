@@ -19,16 +19,21 @@ A stactools package for [NOAA NClimGrid](https://www.ncei.noaa.gov/access/metada
 - Minimum temperature (tmin) in degree Celsius
 - Maximum temperature (tmax) in degree Celsius
 
-The source monthly data is aggregated into four netCDF files, one for each variable, and dates back to 1895. Each monthly netCDF file is updated in place when data for a new month is available. The source daily data is aggregated into monthly netCDF files, with one file for each of the four variables, and dates back to 1951. The netCDF files for the current month of daily data are updated in place when data for a new day is available.
+The source monthly data is aggregated into four netCDF files, one for each variable, and dates back to 1895. Each monthly netCDF file is updated in place when data for a new month is available. 
+
+The source daily data is aggregated into monthly netCDF files, with one file for each of the four variables, and dates back to 1951. Daily data files are marked as either "prelim" or "scaled". The most recent data, i.e., the current month, is preliminary ("prelim") and the NetCDF files are updated in place as data for a new day is made available. Once the month is completed, the preliminary data is scaled to match the corresponding monthly values and a new "scaled" NetCDF file is made available.
 
 ## STAC Examples
 
 - Monthly
   - [Example Collection and Items in JSON form](examples/monthly)
   - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/noaa-nclimgrid/main/examples/monthly/collection.json)
-- Daily
-  - [Example Collection and Items in JSON form](examples/daily)
-  - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/noaa-nclimgrid/main/examples/daily/collection.json)
+- Daily - Preliminary
+  - [Example Collection and Items in JSON form](examples/daily-prelim)
+  - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/noaa-nclimgrid/main/examples/daily-prelim/collection.json)
+- Daily - Scaled
+  - [Example Collection and Items in JSON form](examples/daily-scaled)
+  - [Browse the example STAC](https://radiantearth.github.io/stac-browser/#/external/raw.githubusercontent.com/pjhartzell/noaa-nclimgrid/main/examples/daily-scaled/collection.json)
 
 ## Installation
 

@@ -32,22 +32,6 @@ def modify_href(
         return href
 
 
-def data_frequency(href: str) -> Frequency:
-    """Determine if data is 'monthly' or 'daily' from the passed HREF.
-
-    Args:
-        href (str): HREF to a NClimGrid netCDF or COG file.
-
-    Returns:
-        Frequency: Enum of 'monthly' or 'daily'.
-    """
-    basename = os.path.splitext(os.path.basename(href))[0]
-    frequency = (
-        Frequency.MONTHLY if basename.startswith("nclimgrid") else Frequency.DAILY
-    )
-    return frequency
-
-
 def nc_href_dict(nc_href: str) -> Dict[Variable, str]:
     """Creates a dictionary mapping variables to netCDF HREFs.
 
@@ -59,7 +43,7 @@ def nc_href_dict(nc_href: str) -> Dict[Variable, str]:
     Returns:
         Dict[Variable, str]: A dictionary mapping variables to netCDF HREFs.
     """
-    frequency = data_frequency(nc_href)
+    frequency = Frequency.from_href(nc_href)
 
     base, filename = os.path.split(nc_href)
 

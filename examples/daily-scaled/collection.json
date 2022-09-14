@@ -1,20 +1,20 @@
 {
   "type": "Collection",
-  "id": "noaa-nclimgrid-monthly",
+  "id": "noaa-nclimgrid-daily-scaled",
   "stac_version": "1.0.0",
-  "description": "The Monthly NOAA U.S. Climate Gridded Dataset (NClimGrid) consists of four climate variables derived from the Global Historical Climatology Network Daily dataset (GHCN-D): maximum temperature, minimum temperature, average temperature, and precipitation. Monthly values in a 1/24 degree lat/lon grid (nominal 5x5 kilometer) are provided for the Continental United States. Monthly data is available from 1895 to the present.",
+  "description": "The NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d) consists of four climate variables derived from the Global Historical Climatology Network Daily dataset (GHCN-D): maximum temperature, minimum temperature, average temperature, and precipitation. Daily values in a 1/24 degree lat/lon (nominal 5x5 kilometer) grid are provided for the Continental United States and are available from 1951 to the present. The data in this Collection are scaled to match the corresponding monthly values.",
   "links": [
     {
       "rel": "root",
       "href": "./collection.json",
       "type": "application/json",
-      "title": "Monthly NOAA U.S. Climate Gridded Dataset (NClimGrid)"
+      "title": "NOAA Daily U.S. Climate Gridded Dataset - Scaled"
     },
     {
-      "rel": "cite-as",
-      "href": "https://doi.org/10.7289/V5SX6B56",
-      "type": "text/html",
-      "title": "NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)"
+      "rel": "describedby",
+      "href": "https://www1.ncdc.noaa.gov/pub/data/daily-grids/docs/nclimdiv-description.pdf",
+      "type": "application/pdf",
+      "title": "NOAA Daily NClimGrid Product Description"
     },
     {
       "rel": "license",
@@ -30,27 +30,18 @@
     },
     {
       "rel": "item",
-      "href": "./nclimgrid-189502/nclimgrid-189502.json",
+      "href": "./202201-grd-scaled-02/202201-grd-scaled-02.json",
       "type": "application/json"
     },
     {
       "rel": "item",
-      "href": "./nclimgrid-189501/nclimgrid-189501.json",
+      "href": "./202201-grd-scaled-01/202201-grd-scaled-01.json",
       "type": "application/json"
     }
   ],
   "stac_extensions": [
-    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
     "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
     "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
-  ],
-  "sci:doi": "10.7289/V5SX6B56",
-  "sci:citation": "Vose, Russell S., Applequist, Scott, Squires, Mike, Durre, Imke, Menne, Matthew J., Williams, Claude N. Jr., Fenimore, Chris, Gleason, Karin, and Arndt, Derek (2014): NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid), Version 1. NOAA National Centers for Environmental Information. DOI:10.7289/V5SX6B56.",
-  "sci:publications": [
-    {
-      "doi": "10.1175/JAMC-D-13-0248.1",
-      "citation": "Vose, R. S., Applequist, S., Squires, M., Durre, I., Menne, M. J., Williams, C. N., Jr., Fenimore, C., Gleason, K., & Arndt, D. (2014). Improved Historical Temperature and Precipitation Time Series for U.S. Climate Divisions, Journal of Applied Meteorology and Climatology, 53(5), 1232-1251."
-    }
   ],
   "item_assets": {
     "prcp": {
@@ -58,7 +49,7 @@
       "roles": [
         "data"
       ],
-      "title": "Monthly Precipitation (mm)",
+      "title": "Daily Precipitation (mm)",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -73,7 +64,7 @@
       "roles": [
         "data"
       ],
-      "title": "Monthly Average Temperature (degree Celsius)",
+      "title": "Daily Average Temperature (degree Celsius)",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -88,7 +79,7 @@
       "roles": [
         "data"
       ],
-      "title": "Monthly Maximmum Temperature (degree Celsius)",
+      "title": "Daily Maximmum Temperature (degree Celsius)",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -103,7 +94,7 @@
       "roles": [
         "data"
       ],
-      "title": "Monthly Minimum Temperature (degree Celsius)",
+      "title": "Daily Minimum Temperature (degree Celsius)",
       "raster:bands": [
         {
           "data_type": "float32",
@@ -119,7 +110,7 @@
         "data",
         "source"
       ],
-      "title": "Monthly Precipitation Source Data"
+      "title": "Daily Precipitation Source Data"
     },
     "tavg_source": {
       "type": "application/netcdf",
@@ -127,7 +118,7 @@
         "data",
         "source"
       ],
-      "title": "Monthly Average Temperature Source Data"
+      "title": "Daily Average Temperature Source Data"
     },
     "tmax_source": {
       "type": "application/netcdf",
@@ -135,7 +126,7 @@
         "data",
         "source"
       ],
-      "title": "Monthly Maximmum Temperature Source Data"
+      "title": "Daily Maximmum Temperature Source Data"
     },
     "tmin_source": {
       "type": "application/netcdf",
@@ -143,10 +134,10 @@
         "data",
         "source"
       ],
-      "title": "Monthly Minimum Temperature Source Data"
+      "title": "Daily Minimum Temperature Source Data"
     }
   },
-  "title": "Monthly NOAA U.S. Climate Gridded Dataset (NClimGrid)",
+  "title": "NOAA Daily U.S. Climate Gridded Dataset - Scaled",
   "extent": {
     "spatial": {
       "bbox": [
@@ -161,8 +152,8 @@
     "temporal": {
       "interval": [
         [
-          "1895-01-01T00:00:00Z",
-          "1895-02-28T23:59:59Z"
+          "2022-01-01T00:00:00Z",
+          "2022-01-02T23:59:59Z"
         ]
       ]
     }

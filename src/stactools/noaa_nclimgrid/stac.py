@@ -12,10 +12,9 @@ from stactools.core.io import ReadHrefModifier
 
 from stactools.noaa_nclimgrid import constants
 from stactools.noaa_nclimgrid.cog import create_cogs
-from stactools.noaa_nclimgrid.constants import Frequency, Variable
+from stactools.noaa_nclimgrid.constants import CollectionType, Frequency, Variable
 from stactools.noaa_nclimgrid.utils import (
     cog_asset_dict,
-    data_frequency,
     day_indices,
     month_indices,
     nc_asset_dict,
@@ -45,7 +44,7 @@ def create_item(
     Returns:
         Item: A STAC Item.
     """
-    frequency = data_frequency(cog_hrefs[Variable.PRCP])
+    frequency = Frequency.from_href(cog_hrefs[Variable.PRCP])
     basename = os.path.splitext(os.path.basename(cog_hrefs[Variable.PRCP]))[0]
 
     nominal_datetime: Optional[datetime] = None
@@ -132,7 +131,7 @@ def create_items(
             1. A list of created STAC Items.
             2. A list of HREFs to any newly created COGs.
     """
-    frequency = data_frequency(nc_href)
+    frequency = Frequency.from_href(nc_href)
     nc_hrefs = nc_href_dict(nc_href)
 
     if nc_assets:
@@ -187,33 +186,42 @@ def create_items(
     return (items, created_cogs)
 
 
-def create_collection(frequency: Frequency, nc_assets: bool = False) -> Collection:
+def create_collection(
+    collection_type: CollectionType, nc_assets: bool = False
+) -> Collection:
     """Creates a STAC Collection for monthly or daily NClimGrid data.
 
     Args:
-        frequency (Frequency): One of 'monthly' or 'daily'.
+        collection_type (CollectionType): One of 'monthly', 'daily-prelim', or
+            'daily-scaled'.
         nc_assets (bool): Flag to include Item assets for the source netCDF
             files. Default is False.
 
     Returns:
         Collection: A STAC collection for monthly or daily NClimGrid data.
     """
-    if frequency == Frequency.MONTHLY:
+    if collection_type == CollectionType.MONTHLY:
         collection = Collection(**constants.MONTHLY_COLLECTION)
-
         ScientificExtension.add_to(collection)
         collection.extra_fields["sci:doi"] = constants.MONTHLY_DATA_DOI
         collection.extra_fields["sci:citation"] = constants.MONTHLY_DATA_CITATION
         collection.extra_fields["sci:publications"] = constants.MONTHLY_DATA_PUBLICATION
         collection.add_link(constants.MONTHLY_DATA_LINK)
-
     else:
-        collection = Collection(**constants.DAILY_COLLECTION)
+        if collection_type == CollectionType.DAILY_PRELIM:
+            collection = Collection(**constants.DAILY_PRELIM_COLLECTION)
+        else:
+            collection = Collection(**constants.DAILY_SCALED_COLLECTION)
         collection.add_link(constants.DAILY_DESCRIBEDBY_LINK)
 
     collection.providers = constants.PROVIDERS
 
     item_assets = {}
+    frequency = (
+        Frequency.MONTHLY
+        if collection_type == CollectionType.MONTHLY
+        else Frequency.DAILY
+    )
     for var in Variable:
         item_assets[var.value] = AssetDefinition(cog_asset_dict(frequency, var))
     if nc_assets:

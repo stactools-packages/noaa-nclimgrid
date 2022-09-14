@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict
@@ -8,6 +9,29 @@ from pystac import Extent, Link, Provider, ProviderRole, SpatialExtent, Temporal
 class Frequency(str, Enum):
     DAILY = "daily"
     MONTHLY = "monthly"
+
+    @staticmethod
+    def from_href(href: str) -> "Frequency":
+        basename = os.path.splitext(os.path.basename(href))[0]
+        return (
+            Frequency.MONTHLY if basename.startswith("nclimgrid") else Frequency.DAILY
+        )
+
+
+class CollectionType(str, Enum):
+    MONTHLY = "monthly"
+    DAILY_PRELIM = "daily-prelim"
+    DAILY_SCALED = "daily-scaled"
+
+    @staticmethod
+    def from_href(href: str) -> "CollectionType":
+        basename = os.path.splitext(os.path.basename(href))[0]
+        if basename.startswith("nclimgrid"):
+            return CollectionType.MONTHLY
+        elif "prelim" in basename:
+            return CollectionType.DAILY_PRELIM
+        else:
+            return CollectionType.DAILY_SCALED
 
 
 class Variable(str, Enum):
@@ -106,9 +130,9 @@ KEYWORDS = [
 
 MONTHLY_COLLECTION: Dict[str, Any] = {
     "id": "noaa-nclimgrid-monthly",
-    "title": "NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)",
+    "title": "Monthly NOAA U.S. Climate Gridded Dataset (NClimGrid)",
     "description": (
-        "The NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid) consists of "
+        "The Monthly NOAA U.S. Climate Gridded Dataset (NClimGrid) consists of "
         "four climate variables derived from the Global Historical Climatology "
         "Network Daily dataset (GHCN-D): maximum temperature, minimum temperature, "
         "average temperature, and precipitation. Monthly values in a 1/24 degree "
@@ -149,23 +173,44 @@ MONTHLY_DATA_LINK = Link(
     media_type="text/html",
 )
 
-DAILY_COLLECTION: Dict[str, Any] = {
-    "id": "noaa-nclimgrid-daily",
-    "title": "NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d)",
+DAILY_EXTENT = Extent(
+    SpatialExtent([[-124.708333, 24.541666, -66.999995, 49.375001]]),
+    TemporalExtent([[datetime(1951, 1, 1, tzinfo=timezone.utc), None]]),
+)
+DAILY_LICENSE = "proprietary"
+DAILY_SCALED_COLLECTION: Dict[str, Any] = {
+    "id": "noaa-nclimgrid-daily-scaled",
+    "title": "NOAA Daily U.S. Climate Gridded Dataset - Scaled",
     "description": (
         "The NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d) consists of "
         "four climate variables derived from the Global Historical Climatology "
         "Network Daily dataset (GHCN-D): maximum temperature, minimum temperature, "
         "average temperature, and precipitation. Daily values in a 1/24 degree "
         "lat/lon (nominal 5x5 kilometer) grid are provided for the Continental "
-        "United States. Daily data is available from 1951 to the present."
+        "United States and are available from 1951 to the present. The data in "
+        "this Collection are scaled to match the corresponding monthly "
+        "values."
     ),
-    "license": "proprietary",
+    "license": DAILY_LICENSE,
     "keywords": KEYWORDS,
-    "extent": Extent(
-        SpatialExtent([[-124.708333, 24.541666, -66.999995, 49.375001]]),
-        TemporalExtent([[datetime(1951, 1, 1, tzinfo=timezone.utc), None]]),
+    "extent": DAILY_EXTENT,
+}
+DAILY_PRELIM_COLLECTION: Dict[str, Any] = {
+    "id": "noaa-nclimgrid-daily-prelim",
+    "title": "NOAA Daily U.S. Climate Gridded Dataset - Preliminary",
+    "description": (
+        "The NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d) consists of "
+        "four climate variables derived from the Global Historical Climatology "
+        "Network Daily dataset (GHCN-D): maximum temperature, minimum temperature, "
+        "average temperature, and precipitation. Daily values in a 1/24 degree "
+        "lat/lon (nominal 5x5 kilometer) grid are provided for the Continental "
+        "United States and are available from 1951 to the present. The data in "
+        "this Collection are preliminary and are not scaled to match the "
+        "corresponding monthly values."
     ),
+    "license": DAILY_LICENSE,
+    "keywords": KEYWORDS,
+    "extent": DAILY_EXTENT,
 }
 DAILY_DESCRIBEDBY_LINK = Link(
     rel="describedby",
