@@ -1,0 +1,188 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "202201-grd-scaled-01",
+  "properties": {
+    "proj:epsg": 4326,
+    "proj:transform": [
+      0.04166667,
+      0.0,
+      -124.70833333,
+      0.0,
+      -0.04166667,
+      49.37500127
+    ],
+    "proj:shape": [
+      596,
+      1385
+    ],
+    "start_datetime": "2022-01-01T00:00:00Z",
+    "end_datetime": "2022-01-01T23:59:59Z",
+    "created": "2022-09-14T13:18:41.460567Z",
+    "datetime": "2022-01-01T00:00:00Z"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -66.999995,
+          24.541666
+        ],
+        [
+          -66.999995,
+          49.375001
+        ],
+        [
+          -124.708333,
+          49.375001
+        ],
+        [
+          -124.708333,
+          24.541666
+        ],
+        [
+          -66.999995,
+          24.541666
+        ]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "NOAA Daily U.S. Climate Gridded Dataset - Scaled"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "NOAA Daily U.S. Climate Gridded Dataset - Scaled"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "NOAA Daily U.S. Climate Gridded Dataset - Scaled"
+    }
+  ],
+  "assets": {
+    "prcp": {
+      "href": "./prcp-202201-grd-scaled-01.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Daily Precipitation (mm)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "mm",
+          "spatial_resolution": 5000
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "tavg": {
+      "href": "./tavg-202201-grd-scaled-01.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Daily Average Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "tmax": {
+      "href": "./tmax-202201-grd-scaled-01.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Daily Maximmum Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "tmin": {
+      "href": "./tmin-202201-grd-scaled-01.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Daily Minimum Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "prcp_source": {
+      "href": "../../../tests/data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-scaled.nc",
+      "type": "application/netcdf",
+      "title": "Daily Precipitation Source Data",
+      "created": "2022-05-04T09:12:13.064525Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    },
+    "tavg_source": {
+      "href": "../../../tests/data-files/netcdf/daily/beta/by-month/2022/01/tavg-202201-grd-scaled.nc",
+      "type": "application/netcdf",
+      "title": "Daily Average Temperature Source Data",
+      "created": "2022-05-04T09:20:55.580370Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    },
+    "tmax_source": {
+      "href": "../../../tests/data-files/netcdf/daily/beta/by-month/2022/01/tmax-202201-grd-scaled.nc",
+      "type": "application/netcdf",
+      "title": "Daily Maximmum Temperature Source Data",
+      "created": "2022-05-04T09:18:03.012646Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    },
+    "tmin_source": {
+      "href": "../../../tests/data-files/netcdf/daily/beta/by-month/2022/01/tmin-202201-grd-scaled.nc",
+      "type": "application/netcdf",
+      "title": "Daily Minimum Temperature Source Data",
+      "created": "2022-05-04T09:15:09.550013Z",
+      "roles": [
+        "data",
+        "source"
+      ]
+    }
+  },
+  "bbox": [
+    -124.708333,
+    24.541666,
+    -66.999995,
+    49.375001
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "collection": "noaa-nclimgrid-daily-scaled"
+}

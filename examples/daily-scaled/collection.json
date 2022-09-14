@@ -1,0 +1,181 @@
+{
+  "type": "Collection",
+  "id": "noaa-nclimgrid-daily-scaled",
+  "stac_version": "1.0.0",
+  "description": "The NOAA Daily U.S. Climate Gridded Dataset (NClimGrid-d) consists of four climate variables derived from the Global Historical Climatology Network Daily dataset (GHCN-D): maximum temperature, minimum temperature, average temperature, and precipitation. Daily values in a 1/24 degree lat/lon (nominal 5x5 kilometer) grid are provided for the Continental United States and are available from 1951 to the present. The data in this Collection are scaled to match the corresponding monthly values.",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./collection.json",
+      "type": "application/json",
+      "title": "NOAA Daily U.S. Climate Gridded Dataset - Scaled"
+    },
+    {
+      "rel": "describedby",
+      "href": "https://www1.ncdc.noaa.gov/pub/data/daily-grids/docs/nclimdiv-description.pdf",
+      "type": "application/pdf",
+      "title": "NOAA Daily NClimGrid Product Description"
+    },
+    {
+      "rel": "license",
+      "href": "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332#Constraints",
+      "type": "text/html",
+      "title": "NClimGrid Data Use and Access Constraints"
+    },
+    {
+      "rel": "about",
+      "href": "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332",
+      "type": "text/html",
+      "title": "Product Landing Page"
+    },
+    {
+      "rel": "item",
+      "href": "./202201-grd-scaled-02/202201-grd-scaled-02.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./202201-grd-scaled-01/202201-grd-scaled-01.json",
+      "type": "application/json"
+    }
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "item_assets": {
+    "prcp": {
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ],
+      "title": "Daily Precipitation (mm)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "mm",
+          "spatial_resolution": 5000
+        }
+      ]
+    },
+    "tavg": {
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ],
+      "title": "Daily Average Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ]
+    },
+    "tmax": {
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ],
+      "title": "Daily Maximmum Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ]
+    },
+    "tmin": {
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ],
+      "title": "Daily Minimum Temperature (degree Celsius)",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "nodata": "nan",
+          "unit": "degree Celsius",
+          "spatial_resolution": 5000
+        }
+      ]
+    },
+    "prcp_source": {
+      "type": "application/netcdf",
+      "roles": [
+        "data",
+        "source"
+      ],
+      "title": "Daily Precipitation Source Data"
+    },
+    "tavg_source": {
+      "type": "application/netcdf",
+      "roles": [
+        "data",
+        "source"
+      ],
+      "title": "Daily Average Temperature Source Data"
+    },
+    "tmax_source": {
+      "type": "application/netcdf",
+      "roles": [
+        "data",
+        "source"
+      ],
+      "title": "Daily Maximmum Temperature Source Data"
+    },
+    "tmin_source": {
+      "type": "application/netcdf",
+      "roles": [
+        "data",
+        "source"
+      ],
+      "title": "Daily Minimum Temperature Source Data"
+    }
+  },
+  "title": "NOAA Daily U.S. Climate Gridded Dataset - Scaled",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -124.708333,
+          24.541666,
+          -66.999995,
+          49.375001
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2022-01-01T00:00:00Z",
+          "2022-01-02T23:59:59Z"
+        ]
+      ]
+    }
+  },
+  "license": "proprietary",
+  "keywords": [
+    "NOAA",
+    "NClimGrid",
+    "Air Temperature",
+    "Precipitation",
+    "Surface Observations",
+    "Climatology",
+    "CONUS"
+  ],
+  "providers": [
+    {
+      "name": "NOAA National Centers for Environmental Information",
+      "roles": [
+        "producer",
+        "licensor"
+      ],
+      "url": "https://www.ncei.noaa.gov/"
+    }
+  ]
+}

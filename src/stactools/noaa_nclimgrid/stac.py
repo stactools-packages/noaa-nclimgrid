@@ -187,11 +187,15 @@ def create_items(
     return (items, created_cogs)
 
 
-def create_collection(frequency: Frequency, nc_assets: bool = False) -> Collection:
+def create_collection(
+    frequency: Frequency, prelim: bool = False, nc_assets: bool = False
+) -> Collection:
     """Creates a STAC Collection for monthly or daily NClimGrid data.
 
     Args:
         frequency (Frequency): One of 'monthly' or 'daily'.
+        prelim (bool): Flag indicating the daily Collection is for preliminary
+            data.
         nc_assets (bool): Flag to include Item assets for the source netCDF
             files. Default is False.
 
@@ -208,7 +212,10 @@ def create_collection(frequency: Frequency, nc_assets: bool = False) -> Collecti
         collection.add_link(constants.MONTHLY_DATA_LINK)
 
     else:
-        collection = Collection(**constants.DAILY_COLLECTION)
+        if prelim:
+            collection = Collection(**constants.DAILY_PRELIM_COLLECTION)
+        else:
+            collection = Collection(**constants.DAILY_SCALED_COLLECTION)
         collection.add_link(constants.DAILY_DESCRIBEDBY_LINK)
 
     collection.providers = constants.PROVIDERS

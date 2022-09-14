@@ -9,7 +9,7 @@ from pystac import CatalogType, Item
 from stactools.core.copy import move_asset_file_to_item
 
 from stactools.noaa_nclimgrid import stac
-from stactools.noaa_nclimgrid.constants import Variable
+from stactools.noaa_nclimgrid.constants import Frequency, Variable
 from stactools.noaa_nclimgrid.utils import data_frequency
 
 logger = logging.getLogger(__name__)
@@ -60,16 +60,27 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
 
         items: List[Item] = []
         frequency = data_frequency(hrefs[0])
+        prelim = True if "prelim" in os.path.basename(hrefs[0]) else False
         with TemporaryDirectory() as cog_dir:
             for href in hrefs:
                 temp_items, _ = stac.create_items(href, cog_dir, nc_assets=nc_assets)
                 items.extend(temp_items)
 
-            collection = stac.create_collection(frequency, nc_assets)
+            collection = stac.create_collection(frequency, prelim, nc_assets)
             collection.catalog_type = CatalogType.SELF_CONTAINED
-            collection.set_self_href(
-                os.path.join(outdir, f"{frequency}/collection.json")
-            )
+            if frequency == Frequency.MONTHLY:
+                collection.set_self_href(
+                    os.path.join(outdir, f"{frequency}/collection.json")
+                )
+            else:
+                if prelim:
+                    collection.set_self_href(
+                        os.path.join(outdir, f"{frequency}-prelim/collection.json")
+                    )
+                else:
+                    collection.set_self_href(
+                        os.path.join(outdir, f"{frequency}-scaled/collection.json")
+                    )
 
             collection.add_items(items)
             collection.update_extent_from_items()

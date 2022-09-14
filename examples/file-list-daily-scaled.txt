@@ -1,0 +1,1 @@
+tests/data-files/netcdf/daily/beta/by-month/2022/01/prcp-202201-grd-scaled.nc

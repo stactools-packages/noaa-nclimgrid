@@ -104,7 +104,7 @@ def test_read_href_modifier() -> None:
 def test_daily_collection() -> None:
     collection = stac.create_collection(Frequency.DAILY, nc_assets=True)
     collection_dict = collection.to_dict()
-    assert collection.id == "noaa-nclimgrid-daily"
+    assert collection.id == "noaa-nclimgrid-daily-scaled"
     assert "sci:doi" not in collection_dict
     assert "sci:citation" not in collection_dict
     assert "sci:publications" not in collection_dict
