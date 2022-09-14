@@ -72,10 +72,8 @@ def create_item(
     item.common_metadata.end_datetime = end_datetime
     item.common_metadata.created = datetime.now(tz=timezone.utc)
 
-    if collection_type == CollectionType.DAILY_PRELIM:
-        item.properties["nclimgrid:daily_type"] = CollectionType.DAILY_PRELIM[6:]
-    elif collection_type == CollectionType.DAILY_SCALED:
-        item.properties["nclimgrid:daily_type"] = CollectionType.DAILY_SCALED[6:]
+    if "daily" in collection_type:
+        item.properties["nclimgrid:daily_type"] = collection_type[6:]
 
     item.assets.pop("data")
     for var in Variable:
