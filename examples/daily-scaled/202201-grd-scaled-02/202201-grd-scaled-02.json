@@ -18,7 +18,8 @@
     ],
     "start_datetime": "2022-01-02T00:00:00Z",
     "end_datetime": "2022-01-02T23:59:59Z",
-    "created": "2022-09-14T17:45:22.982513Z",
+    "created": "2022-09-14T20:23:57.360414Z",
+    "nclimgrid:daily_type": "scaled",
     "datetime": "2022-01-02T00:00:00Z"
   },
   "geometry": {

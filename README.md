@@ -12,6 +12,8 @@
   - [proj](https://github.com/stac-extensions/projection/)
   - [raster](https://github.com/stac-extensions/raster)
   - [scientific](https://github.com/stac-extensions/scientific)
+- Extra fields:
+  - `nclimgrid:daily_type`: One of `scaled` or `prelim` to indicate the type of daily data.
 
 A stactools package for [NOAA NClimGrid](https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332) monthly and daily data covering the Continental United States (CONUS). The data consists of four variables:
 - Precipitation (prcp) in millimeters
