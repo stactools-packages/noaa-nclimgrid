@@ -9,8 +9,7 @@ from pystac import CatalogType, Item
 from stactools.core.copy import move_asset_file_to_item
 
 from stactools.noaa_nclimgrid import stac
-from stactools.noaa_nclimgrid.constants import Variable
-from stactools.noaa_nclimgrid.utils import collection_type
+from stactools.noaa_nclimgrid.constants import CollectionType, Variable
 
 logger = logging.getLogger(__name__)
 
@@ -59,15 +58,17 @@ def create_noaa_nclimgrid_command(cli: Group) -> Command:
             hrefs = [os.path.abspath(line.strip()) for line in f.readlines()]
 
         items: List[Item] = []
-        type = collection_type(hrefs[0])
+        collection_type = CollectionType.from_href(hrefs[0])
         with TemporaryDirectory() as cog_dir:
             for href in hrefs:
                 temp_items, _ = stac.create_items(href, cog_dir, nc_assets=nc_assets)
                 items.extend(temp_items)
 
-            collection = stac.create_collection(type, nc_assets)
+            collection = stac.create_collection(collection_type, nc_assets)
             collection.catalog_type = CatalogType.SELF_CONTAINED
-            collection.set_self_href(os.path.join(outdir, f"{type}/collection.json"))
+            collection.set_self_href(
+                os.path.join(outdir, f"{collection_type}/collection.json")
+            )
 
             collection.add_items(items)
             collection.update_extent_from_items()

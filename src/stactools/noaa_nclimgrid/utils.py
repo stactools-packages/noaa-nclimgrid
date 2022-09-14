@@ -10,7 +10,7 @@ from pystac.utils import datetime_to_str
 from stactools.core.io import ReadHrefModifier
 
 from stactools.noaa_nclimgrid import constants
-from stactools.noaa_nclimgrid.constants import CollectionType, Frequency, Variable
+from stactools.noaa_nclimgrid.constants import Frequency, Variable
 
 
 def modify_href(
@@ -32,42 +32,6 @@ def modify_href(
         return href
 
 
-def data_frequency(href: str) -> Frequency:
-    """Determine if data is 'monthly' or 'daily' from the passed HREF.
-
-    Args:
-        href (str): HREF to a NClimGrid netCDF or COG file.
-
-    Returns:
-        Frequency: Enum of 'monthly' or 'daily'.
-    """
-    basename = os.path.splitext(os.path.basename(href))[0]
-    frequency = (
-        Frequency.MONTHLY if basename.startswith("nclimgrid") else Frequency.DAILY
-    )
-    return frequency
-
-
-def collection_type(href: str) -> CollectionType:
-    """Determine if data belongs to a 'monthly', 'daily-prelim', or 'daily-scaled'
-    collection.
-
-    Args:
-        href (str): HREF to a NClimGrid netCDF or COG file.
-
-    Returns:
-        CollectionType: Enum of 'monthly', 'daily-prelim', or 'daily-scaled'.
-    """
-    basename = os.path.splitext(os.path.basename(href))[0]
-    if basename.startswith("nclimgrid"):
-        type = CollectionType.MONTHLY
-    elif "prelim" in basename:
-        type = CollectionType.DAILY_PRELIM
-    else:
-        type = CollectionType.DAILY_SCALED
-    return type
-
-
 def nc_href_dict(nc_href: str) -> Dict[Variable, str]:
     """Creates a dictionary mapping variables to netCDF HREFs.
 
@@ -79,7 +43,7 @@ def nc_href_dict(nc_href: str) -> Dict[Variable, str]:
     Returns:
         Dict[Variable, str]: A dictionary mapping variables to netCDF HREFs.
     """
-    frequency = data_frequency(nc_href)
+    frequency = Frequency.from_href(nc_href)
 
     base, filename = os.path.split(nc_href)
 

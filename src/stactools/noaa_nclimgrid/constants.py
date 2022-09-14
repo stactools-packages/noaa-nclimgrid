@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict
@@ -9,11 +10,28 @@ class Frequency(str, Enum):
     DAILY = "daily"
     MONTHLY = "monthly"
 
+    @staticmethod
+    def from_href(href: str) -> "Frequency":
+        basename = os.path.splitext(os.path.basename(href))[0]
+        return (
+            Frequency.MONTHLY if basename.startswith("nclimgrid") else Frequency.DAILY
+        )
+
 
 class CollectionType(str, Enum):
     MONTHLY = "monthly"
     DAILY_PRELIM = "daily-prelim"
     DAILY_SCALED = "daily-scaled"
+
+    @staticmethod
+    def from_href(href: str) -> "CollectionType":
+        basename = os.path.splitext(os.path.basename(href))[0]
+        if basename.startswith("nclimgrid"):
+            return CollectionType.MONTHLY
+        elif "prelim" in basename:
+            return CollectionType.DAILY_PRELIM
+        else:
+            return CollectionType.DAILY_SCALED
 
 
 class Variable(str, Enum):

@@ -15,7 +15,6 @@ from stactools.noaa_nclimgrid.cog import create_cogs
 from stactools.noaa_nclimgrid.constants import CollectionType, Frequency, Variable
 from stactools.noaa_nclimgrid.utils import (
     cog_asset_dict,
-    data_frequency,
     day_indices,
     month_indices,
     nc_asset_dict,
@@ -45,7 +44,7 @@ def create_item(
     Returns:
         Item: A STAC Item.
     """
-    frequency = data_frequency(cog_hrefs[Variable.PRCP])
+    frequency = Frequency.from_href(cog_hrefs[Variable.PRCP])
     basename = os.path.splitext(os.path.basename(cog_hrefs[Variable.PRCP]))[0]
 
     nominal_datetime: Optional[datetime] = None
@@ -132,7 +131,7 @@ def create_items(
             1. A list of created STAC Items.
             2. A list of HREFs to any newly created COGs.
     """
-    frequency = data_frequency(nc_href)
+    frequency = Frequency.from_href(nc_href)
     nc_hrefs = nc_href_dict(nc_href)
 
     if nc_assets:
