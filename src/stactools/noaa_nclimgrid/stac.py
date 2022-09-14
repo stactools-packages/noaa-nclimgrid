@@ -12,7 +12,7 @@ from stactools.core.io import ReadHrefModifier
 
 from stactools.noaa_nclimgrid import constants
 from stactools.noaa_nclimgrid.cog import create_cogs
-from stactools.noaa_nclimgrid.constants import Frequency, Variable
+from stactools.noaa_nclimgrid.constants import CollectionType, Frequency, Variable
 from stactools.noaa_nclimgrid.utils import (
     cog_asset_dict,
     data_frequency,
@@ -188,31 +188,28 @@ def create_items(
 
 
 def create_collection(
-    frequency: Frequency, prelim: bool = False, nc_assets: bool = False
+    collection_type: CollectionType, nc_assets: bool = False
 ) -> Collection:
     """Creates a STAC Collection for monthly or daily NClimGrid data.
 
     Args:
-        frequency (Frequency): One of 'monthly' or 'daily'.
-        prelim (bool): Flag indicating the daily Collection is for preliminary
-            data.
+        collection_type (CollectionType): One of 'monthly', 'daily-prelim', or
+            'daily-scaled'.
         nc_assets (bool): Flag to include Item assets for the source netCDF
             files. Default is False.
 
     Returns:
         Collection: A STAC collection for monthly or daily NClimGrid data.
     """
-    if frequency == Frequency.MONTHLY:
+    if collection_type == CollectionType.MONTHLY:
         collection = Collection(**constants.MONTHLY_COLLECTION)
-
         ScientificExtension.add_to(collection)
         collection.extra_fields["sci:doi"] = constants.MONTHLY_DATA_DOI
         collection.extra_fields["sci:citation"] = constants.MONTHLY_DATA_CITATION
         collection.extra_fields["sci:publications"] = constants.MONTHLY_DATA_PUBLICATION
         collection.add_link(constants.MONTHLY_DATA_LINK)
-
     else:
-        if prelim:
+        if collection_type == CollectionType.DAILY_PRELIM:
             collection = Collection(**constants.DAILY_PRELIM_COLLECTION)
         else:
             collection = Collection(**constants.DAILY_SCALED_COLLECTION)
@@ -221,6 +218,11 @@ def create_collection(
     collection.providers = constants.PROVIDERS
 
     item_assets = {}
+    frequency = (
+        Frequency.MONTHLY
+        if collection_type == CollectionType.MONTHLY
+        else Frequency.DAILY
+    )
     for var in Variable:
         item_assets[var.value] = AssetDefinition(cog_asset_dict(frequency, var))
     if nc_assets:

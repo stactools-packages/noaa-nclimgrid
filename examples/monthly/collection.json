@@ -2,13 +2,13 @@
   "type": "Collection",
   "id": "noaa-nclimgrid-monthly",
   "stac_version": "1.0.0",
-  "description": "The NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid) consists of four climate variables derived from the Global Historical Climatology Network Daily dataset (GHCN-D): maximum temperature, minimum temperature, average temperature, and precipitation. Monthly values in a 1/24 degree lat/lon grid (nominal 5x5 kilometer) are provided for the Continental United States. Monthly data is available from 1895 to the present.",
+  "description": "The Monthly NOAA U.S. Climate Gridded Dataset (NClimGrid) consists of four climate variables derived from the Global Historical Climatology Network Daily dataset (GHCN-D): maximum temperature, minimum temperature, average temperature, and precipitation. Monthly values in a 1/24 degree lat/lon grid (nominal 5x5 kilometer) are provided for the Continental United States. Monthly data is available from 1895 to the present.",
   "links": [
     {
       "rel": "root",
       "href": "./collection.json",
       "type": "application/json",
-      "title": "NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)"
+      "title": "Monthly NOAA U.S. Climate Gridded Dataset (NClimGrid)"
     },
     {
       "rel": "cite-as",
@@ -146,7 +146,7 @@
       "title": "Monthly Minimum Temperature Source Data"
     }
   },
-  "title": "NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid)",
+  "title": "Monthly NOAA U.S. Climate Gridded Dataset (NClimGrid)",
   "extent": {
     "spatial": {
       "bbox": [

@@ -10,6 +10,12 @@ class Frequency(str, Enum):
     MONTHLY = "monthly"
 
 
+class CollectionType(str, Enum):
+    MONTHLY = "monthly"
+    DAILY_PRELIM = "daily-prelim"
+    DAILY_SCALED = "daily-scaled"
+
+
 class Variable(str, Enum):
     PRCP = "prcp"
     TAVG = "tavg"

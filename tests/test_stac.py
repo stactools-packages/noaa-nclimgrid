@@ -1,7 +1,7 @@
 from tempfile import TemporaryDirectory
 
 from stactools.noaa_nclimgrid import stac
-from stactools.noaa_nclimgrid.constants import Frequency, Variable
+from stactools.noaa_nclimgrid.constants import CollectionType, Variable
 from tests import test_data
 
 
@@ -102,7 +102,7 @@ def test_read_href_modifier() -> None:
 
 
 def test_daily_collection() -> None:
-    collection = stac.create_collection(Frequency.DAILY, nc_assets=True)
+    collection = stac.create_collection(CollectionType.DAILY_SCALED, nc_assets=True)
     collection_dict = collection.to_dict()
     assert collection.id == "noaa-nclimgrid-daily-scaled"
     assert "sci:doi" not in collection_dict
@@ -113,7 +113,7 @@ def test_daily_collection() -> None:
 
 
 def test_monthly_collection() -> None:
-    collection = stac.create_collection(Frequency.MONTHLY)
+    collection = stac.create_collection(CollectionType.MONTHLY)
     collection_dict = collection.to_dict()
     assert collection.id == "noaa-nclimgrid-monthly"
     assert "sci:doi" in collection_dict
