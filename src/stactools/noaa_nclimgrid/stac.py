@@ -45,6 +45,7 @@ def create_item(
         Item: A STAC Item.
     """
     frequency = Frequency.from_href(cog_hrefs[Variable.PRCP])
+    collection_type = CollectionType.from_href(cog_hrefs[Variable.PRCP])
     basename = os.path.splitext(os.path.basename(cog_hrefs[Variable.PRCP]))[0]
 
     nominal_datetime: Optional[datetime] = None
@@ -70,6 +71,9 @@ def create_item(
     item.common_metadata.start_datetime = start_datetime
     item.common_metadata.end_datetime = end_datetime
     item.common_metadata.created = datetime.now(tz=timezone.utc)
+
+    if "daily" in collection_type:
+        item.properties["nclimgrid:daily_type"] = collection_type[6:]
 
     item.assets.pop("data")
     for var in Variable:
